@@ -61,7 +61,8 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
       const a=authMod.getAuth(appMod.getApps()[0]);
       const user=a.currentUser;
       if(!user)return alert('Please sign in again.');
-      await fs.addDoc(fs.collection(fs.getFirestore(appMod.getApps()[0]),'users',user.uid,'trades'),{ticker,stock:ticker,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:STOCK_BASE+'nse/NSE_'+encodeURIComponent(ticker)+'.svg',createdAt:fs.serverTimestamp()});
+      const db=fs.getFirestore(appMod.getApps()[0]);
+      await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:STOCK_BASE+'nse/NSE_'+encodeURIComponent(ticker)+'.svg',createdAt:fs.serverTimestamp()});
       document.querySelector('.modal-back.open')?.remove();
     }catch(e){alert('Could not save trade: '+(e.code||'error'));}
     return true;
