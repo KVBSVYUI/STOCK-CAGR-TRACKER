@@ -67,6 +67,22 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
     }catch(e){alert('Could not save trade: '+(e.code||'error'));}
     return true;
   }
+  function patchSameDaySave(){
+    const save=document.getElementById('save');
+    if(!save||save.dataset.bptSameDayClick)return;
+    const original=save.onclick;
+    if(typeof original!=='function')return;
+    save.dataset.bptSameDayClick='1';
+    save.onclick=async function(e){
+      const bd=document.getElementById('mBD')?.value||'',sd=document.getElementById('mSD')?.value||'';
+      if(bd&&sd&&bd===sd){
+        e?.preventDefault();
+        e?.stopPropagation();
+        return saveSameDayTrade();
+      }
+      return original.call(this,e);
+    };
+  }
   function sameDayTradeGuard(){
     if(document.documentElement.dataset.bptSameDayGuard)return;
     document.documentElement.dataset.bptSameDayGuard='1';
@@ -93,10 +109,11 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
       let a=document.getElementById('bptAccountButton');
       if(!a){a=document.createElement('button');a.id='bptAccountButton';a.type='button';a.className='icon';a.textContent='👤';a.title='Account';a.setAttribute('aria-label','Account');right.insertBefore(a,right.firstChild);a.onclick=account}
       const s=document.getElementById('settings');if(s)s.onclick=account;
-      const add=document.getElementById('addTradeOpen');if(add&&!add.dataset.bptStockHook){add.dataset.bptStockHook='1';add.addEventListener('click',()=>setTimeout(stockAutocomplete,0))}
+      const add=document.getElementById('addTradeOpen');if(add&&!add.dataset.bptStockHook){add.dataset.bptStockHook='1';add.addEventListener('click',()=>setTimeout(()=>{stockAutocomplete();patchSameDaySave()},0))}
       done=true;
     }
     stockAutocomplete();
+    patchSameDaySave();
   }
   function start(){sameDayTradeGuard();apply();let n=0;const timer=setInterval(()=>{apply();if(++n>=80||done)clearInterval(timer)},250)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
