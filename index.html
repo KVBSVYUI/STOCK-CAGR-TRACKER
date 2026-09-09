@@ -3,122 +3,190 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b1220">
-<meta name="description" content="Track booked stock profits, trade CAGR and overall realized XIRR.">
+<meta name="theme-color" content="#08111f">
+<meta name="description" content="Booked Profit Tracker — realized stock profits, trade CAGR and XIRR.">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Booked Profit Tracker</title>
 <style>
-:root{--bg:#09111f;--card:#111a2b;--card2:#172238;--text:#f5f7fb;--muted:#9aa7bd;--line:#26344d;--accent:#67e8a5;--danger:#ff7777;--blue:#78a9ff}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#08101d,#101b2e);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-main{max-width:1050px;margin:auto;padding:18px 14px 50px}.hero{padding:8px 3px 18px}.hero h1{font-size:28px;margin:0 0 5px}.hero p{margin:0;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{background:rgba(17,26,43,.96);border:1px solid var(--line);border-radius:16px;padding:15px}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.value{font-size:23px;font-weight:800;margin-top:7px}.positive{color:var(--accent)}.negative{color:var(--danger)}
-.form-card,.section{margin-top:12px}.section-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.section h2,.form-card h2{font-size:18px;margin:0}.hint{font-size:11px;color:var(--muted)}
-.form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:9px;align-items:end}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.field input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0b1322;color:var(--text);font-size:14px;outline:0}.field input:focus{border-color:var(--blue)}
-button{padding:11px 14px;border-radius:10px;border:0;font-weight:750;cursor:pointer}.add{background:var(--accent);color:#06130d}.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}.danger{background:transparent;color:var(--danger);padding:5px}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:850px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{color:var(--muted);font-size:10px;text-transform:uppercase}tr:last-child td{border-bottom:0}.empty{padding:32px;text-align:center;color:var(--muted)}
-.tools{display:flex;gap:7px}.note{margin-top:12px;color:var(--muted);font-size:11px;line-height:1.5}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
-@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr 1fr}.form button{width:100%}}
-@media(max-width:500px){main{padding:14px 10px 35px}.hero h1{font-size:24px}.grid{gap:7px}.card{padding:12px}.value{font-size:18px}.form{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.tools{width:100%}.tools button{flex:1}}
+:root{
+ --bg:#070d18;--panel:#0d1728;--panel2:#111f34;--line:#21314b;--text:#f7f9fc;--muted:#8fa1ba;
+ --green:#5ee6a4;--green2:#24b878;--red:#ff6f7d;--blue:#76a9ff;--gold:#f7c873;
+ --shadow:0 18px 50px rgba(0,0,0,.25);--radius:20px;
+}
+*{box-sizing:border-box}html{background:var(--bg)}
+body{margin:0;background:radial-gradient(circle at 20% 0%,#12243b 0,#070d18 38%,#050a12 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}button{cursor:pointer}
+.app{max-width:1120px;margin:auto;padding:18px 16px 56px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:5px 0 20px}
+.brand{display:flex;align-items:center;gap:12px}.brandmark{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#17324e,#0e1b2d);border:1px solid #2b4565;display:grid;place-items:center;box-shadow:0 10px 30px #0004}
+.brandmark svg{width:31px}.brand h1{font-size:18px;margin:0;letter-spacing:-.02em}.brand p{margin:3px 0 0;color:var(--muted);font-size:11px}
+.top-actions{display:flex;gap:8px}.icon-btn{width:42px;height:42px;border:1px solid var(--line);background:#0d1727;color:var(--text);border-radius:13px;display:grid;place-items:center}
+.status{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);margin-left:auto;margin-right:8px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.hero{background:linear-gradient(135deg,#10233b,#0b1627 55%,#0b1b25);border:1px solid #1d3450;border-radius:24px;padding:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-90px;top:-110px;background:#36d58c18;filter:blur(4px)}
+.hero h2{margin:0;font-size:26px;letter-spacing:-.04em}.hero p{margin:7px 0 0;color:var(--muted);max-width:620px;font-size:13px;line-height:1.55}
+.hero-row{display:flex;justify-content:space-between;align-items:end;gap:20px;position:relative;z-index:1}.hero-profit{font-size:36px;font-weight:850;letter-spacing:-.04em;margin-top:16px}.hero-profit small{font-size:11px;color:var(--muted);font-weight:650;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:3px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.metric{background:#0c1626cc;border:1px solid var(--line);border-radius:17px;padding:14px}.metric .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.metric .v{font-size:20px;font-weight:800;margin-top:6px}.pos{color:var(--green)}.neg{color:var(--red)}
+.card{background:linear-gradient(180deg,#0e192a,#0b1422);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.section{margin-top:14px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 18px 12px}.section-title{margin:0;font-size:16px}.section-sub{margin:4px 0 0;font-size:11px;color:var(--muted)}
+.primary{border:0;background:linear-gradient(135deg,#67eca9,#39c985);color:#04120b;font-weight:850;border-radius:12px;padding:11px 15px;box-shadow:0 10px 24px #32d18b20}
+.secondary{border:1px solid var(--line);background:#111e31;color:var(--text);font-weight:700;border-radius:11px;padding:10px 13px}
+.form-grid{padding:0 18px 18px;display:grid;grid-template-columns:1.25fr .75fr .9fr .9fr .9fr 1fr 1fr auto;gap:9px;align-items:end}
+.field label{display:block;color:var(--muted);font-size:10px;margin:0 0 5px}.field input{width:100%;border:1px solid var(--line);background:#07111f;color:var(--text);border-radius:11px;padding:11px 10px;outline:none}.field input:focus{border-color:#568fe5;box-shadow:0 0 0 3px #568fe51c}
+.company-wrap{position:relative}.company-preview{position:absolute;right:7px;bottom:7px;width:27px;height:27px;border-radius:8px;overflow:hidden;background:#17253a;display:grid;place-items:center;font-size:9px;font-weight:800;color:#bcd0ea}.company-preview img{width:100%;height:100%;object-fit:contain;background:#fff}
+.helper{padding:0 18px 17px;color:var(--muted);font-size:10px;line-height:1.5}
+.trades{padding:0 14px 14px}.trade{display:grid;grid-template-columns:48px minmax(150px,1.7fr) 1fr 1fr 1fr 70px;gap:12px;align-items:center;padding:14px 8px;border-top:1px solid var(--line)}.logo{width:44px;height:44px;border-radius:13px;background:#152238;border:1px solid #263a57;display:grid;place-items:center;overflow:hidden;font-size:12px;font-weight:850;color:#bcd0e9}.logo img{width:100%;height:100%;object-fit:contain;background:#fff}.trade-main b{font-size:14px}.trade-main span{display:block;color:var(--muted);font-size:10px;margin-top:3px}.trade-stat .k{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.06em}.trade-stat .v{display:block;font-weight:750;font-size:12px;margin-top:3px}.delete{border:0;background:transparent;color:#788ba7;font-size:11px}.delete:hover{color:var(--red)}
+.empty{padding:35px 20px;text-align:center;color:var(--muted);font-size:12px}.empty-icon{font-size:34px;margin-bottom:8px}
+.footer{margin-top:18px;text-align:center;color:#61738d;font-size:10px}
+.modal-backdrop{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;justify-content:center;padding:14px;z-index:20}.modal-backdrop.open{display:flex}.modal{width:min(520px,100%);background:#0c1728;border:1px solid #28405e;border-radius:22px;padding:20px;box-shadow:0 30px 80px #0009}.modal h3{margin:0 0 5px}.modal p{font-size:11px;color:var(--muted);line-height:1.5}.modal-row{display:flex;gap:8px;margin-top:12px}.modal-row input{flex:1}.modal input{border:1px solid var(--line);background:#07111f;color:var(--text);border-radius:11px;padding:11px;outline:0;width:100%}.close{float:right;border:0;background:transparent;color:var(--muted);font-size:22px}
+.auth{min-height:100dvh;display:grid;place-items:center;padding:18px}.auth-card{width:min(430px,100%);padding:25px;border-radius:25px;background:linear-gradient(180deg,#101d31,#0a1321);border:1px solid #263b57;box-shadow:var(--shadow)}.auth-logo{width:62px;height:62px;border-radius:18px;background:#142943;display:grid;place-items:center;margin-bottom:18px}.auth h2{margin:0;font-size:25px}.auth p{color:var(--muted);font-size:12px;line-height:1.5}.auth .field{margin-top:12px}.auth-actions{display:grid;gap:8px;margin-top:15px}.error{color:var(--red);font-size:11px;min-height:15px;margin-top:8px}
+.setup-banner{margin-top:12px;padding:13px 15px;border:1px solid #5b4b25;background:#2a2413;color:#e9d8a4;border-radius:15px;font-size:11px;line-height:1.5}
+@media(max-width:1050px){.form-grid{grid-template-columns:1fr 1fr 1fr 1fr}.form-grid .primary{width:100%}.trade{grid-template-columns:48px 1.5fr 1fr 1fr 1fr}.trade .delete{grid-column:5;justify-self:end}.trade-stat:nth-of-type(4){display:none}}
+@media(max-width:620px){.app{padding:12px 10px 45px}.topbar{padding-bottom:14px}.status{display:none}.brandmark{width:43px;height:43px}.hero{padding:19px}.hero h2{font-size:22px}.hero-profit{font-size:31px}.metrics{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr 1fr}.form-grid .field:first-child{grid-column:1/-1}.form-grid .primary{grid-column:1/-1}.form-grid .field{min-width:0}.trade{grid-template-columns:42px 1fr auto;gap:9px;padding:13px 5px}.logo{width:39px;height:39px}.trade-stat{display:none!important}.trade .delete{grid-column:auto}.section-head{padding:15px 14px 10px}}
 </style>
+<script src="app-config.js"></script>
 </head>
 <body>
-<main>
-<div class="hero">
-<h1>📈 Booked Profit Tracker</h1>
-<p>Track only stocks you have sold — profit, trade CAGR and overall realized XIRR.</p>
-</div>
+<div id="root"></div>
 
-<div class="grid">
-<div class="card"><div class="label">Booked profit</div><div class="value" id="profit">₹0</div></div>
-<div class="card"><div class="label">Total cost</div><div class="value" id="cost">₹0</div></div>
-<div class="card"><div class="label">Total sale value</div><div class="value" id="sale">₹0</div></div>
-<div class="card"><div class="label">Realized XIRR</div><div class="value" id="xirr">—</div></div>
-</div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile,signOut} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import {getFirestore,collection,addDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-<div class="card form-card">
-<div class="section-head">
-<h2>Add a sold trade</h2>
-<span class="hint">Use the actual buy and sell dates.</span>
-</div>
-<div class="form">
-<div class="field"><label>Stock</label><input id="stock" placeholder="e.g. TCS"></div>
-<div class="field"><label>Buy date</label><input id="buyDate" type="date"></div>
-<div class="field"><label>Sell date</label><input id="sellDate" type="date"></div>
-<div class="field"><label>Cost / buy amount ₹</label><input id="costIn" type="number" min="0" step="0.01" placeholder="50000"></div>
-<div class="field"><label>Sale amount ₹</label><input id="saleIn" type="number" min="0" step="0.01" placeholder="70000"></div>
-<button class="add" onclick="addTrade()">+ Add</button>
-</div>
-<div class="note">CAGR is calculated for each completed trade. Overall XIRR uses each buy amount as a cash outflow on the buy date and each sale amount as an inflow on the sell date. This is the meaningful way to annualize realized returns; a profit amount by itself cannot have a CAGR/XIRR.</div>
-</div>
+const CONFIG = window.APP_CONFIG || {};
+const root=document.getElementById('root');
+const localKey='bookedProfitTracker.v3';
+let app,auth,db,unsubscribe=null,trades=[];
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const fmt=d=>new Date(d+'T00:00:00').toLocaleDateString('en-IN');
+const years=(a,b)=>(new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/31536000000;
+function cagr(t){const y=years(t.buyDate,t.sellDate);return y>0&&t.cost>0?Math.pow(t.sale/t.cost,1/y)-1:null}
+function xnpv(r,flows){const t0=new Date(flows[0].date+'T00:00:00');return flows.reduce((s,f)=>s+f.amount/Math.pow(1+r,(new Date(f.date+'T00:00:00')-t0)/31536000000),0)}
+function xirr(flows){if(flows.length<2||!flows.some(x=>x.amount<0)||!flows.some(x=>x.amount>0))return null;flows=[...flows].sort((a,b)=>a.date.localeCompare(b.date));let lo=-.999999,hi=1;while(xnpv(hi,flows)>0&&hi<1e8)hi*=2;if(xnpv(hi,flows)>0)return null;for(let i=0;i<160;i++){let m=(lo+hi)/2;if(xnpv(m,flows)>0)lo=m;else hi=m}return(lo+hi)/2}
+function initials(s){return String(s||'?').replace(/[^A-Z0-9]/gi,'').slice(0,2).toUpperCase()||'?'}
+function logoUrl(ticker){const token=CONFIG.logoDevToken||'';if(!token||!ticker)return '';return `https://img.logo.dev/ticker/${encodeURIComponent(ticker.toUpperCase())}.IN?token=${encodeURIComponent(token)}&size=96&format=png`}
+function logoHtml(t){const u=t.logoUrl||logoUrl(t.ticker||t.stock);return u?`<img src="${u}" alt="" onerror="this.remove()">`:`<span>${initials(t.ticker||t.stock)}</span>`}
 
-<div class="section">
-<div class="section-head">
-<h2>Sold trades</h2>
-<div class="tools"><button class="secondary" onclick="exportData()">Export</button><button class="secondary" onclick="clearAll()">Clear all</button></div>
-</div>
-<div class="table-wrap" id="table"></div>
-</div>
-
-<div class="footer">Your trades are stored locally in this browser/device. No broker login or API key is required.</div>
-</main>
-
-<script>
-const KEY='bookedProfitTracker.v2';
-let trades=JSON.parse(localStorage.getItem(KEY)||'[]');
-const $=id=>document.getElementById(id);
-const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n||0);
-const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function years(a,b){return (new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/31536000000}
-function tradeCagr(t){
- const y=years(t.buyDate,t.sellDate);
- if(y<=0||t.cost<=0||t.sale<0)return null;
- return Math.pow(t.sale/t.cost,1/y)-1;
+function authId(username){
+ const u=String(username||'').trim().toLowerCase();
+ return u+'@bookedprofittracker.app';
 }
-function xnpv(rate,flows){
- const t0=new Date(flows[0].date+'T00:00:00');
- return flows.reduce((s,f)=>s+f.amount/Math.pow(1+rate,(new Date(f.date+'T00:00:00')-t0)/31536000000),0);
+function validUsername(u){
+ return /^[a-zA-Z0-9_]{3,24}$/.test(u);
 }
-function xirr(flows){
- if(flows.length<2||!flows.some(x=>x.amount<0)||!flows.some(x=>x.amount>0))return null;
- flows=[...flows].sort((a,b)=>a.date.localeCompare(b.date));
- let lo=-0.999999,hi=1;
- while(xnpv(hi,flows)>0 && hi<1e8)hi*=2;
- if(xnpv(hi,flows)>0)return null;
- for(let i=0;i<150;i++){let mid=(lo+hi)/2;if(xnpv(mid,flows)>0)lo=mid;else hi=mid}
- return (lo+hi)/2;
+function authScreen(mode='login',msg=''){
+ root.innerHTML=`<main class="auth"><div class="auth-card">
+ <div class="auth-logo"><svg width="38" viewBox="0 0 48 48" fill="none"><path d="M9 34 19 24l8 7 12-17" stroke="#5ee6a4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="34" r="3" fill="#5ee6a4"/><circle cx="19" cy="24" r="3" fill="#5ee6a4"/><circle cx="27" cy="31" r="3" fill="#5ee6a4"/><circle cx="39" cy="14" r="3" fill="#5ee6a4"/></svg></div>
+ <h2>${mode==='login'?'Welcome back':'Create your account'}</h2>
+ <p>${mode==='login'?'Sign in on any phone using your username and password. No Gmail is required.':'Create a private cloud account using only a username and password.'}</p>
+ <div class="field"><label>Username</label><input id="username" type="text" autocomplete="username" autocapitalize="none" placeholder="e.g. mohit123"></div>
+ <div class="field"><label>Password</label><input id="password" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}" placeholder="Minimum 6 characters"></div>
+ <div class="error">${esc(msg)}</div>
+ <div class="auth-actions"><button class="primary" id="authBtn">${mode==='login'?'Sign in':'Create account'}</button>
+ <button class="secondary" id="switchBtn">${mode==='login'?'New here? Create account':'Already have an account? Sign in'}</button></div>
+ </div></main>`;
+ document.getElementById('switchBtn').onclick=()=>authScreen(mode==='login'?'signup':'login');
+ document.getElementById('authBtn').onclick=async()=>{
+   const u=username.value.trim(),p=password.value;
+   if(!validUsername(u))return authScreen(mode,'Username must be 3–24 characters: letters, numbers or underscore.');
+   if(p.length<6)return authScreen(mode,'Password must be at least 6 characters.');
+   try{
+     const e=authId(u);
+     if(mode==='login'){
+       await signInWithEmailAndPassword(auth,e,p);
+     }else{
+       const cred=await createUserWithEmailAndPassword(auth,e,p);
+       await updateProfile(cred.user,{displayName:u});
+     }
+   }catch(err){authScreen(mode,prettyAuthError(err))}
+ };
 }
-function addTrade(){
- const stock=$('stock').value.trim().toUpperCase(), buyDate=$('buyDate').value, sellDate=$('sellDate').value;
- const cost=Number($('costIn').value), sale=Number($('saleIn').value);
- if(!stock||!buyDate||!sellDate||!(cost>0)||sale<0){alert('Please fill every field correctly.');return}
- if(sellDate<=buyDate){alert('Sell date must be after buy date.');return}
- trades.push({id:Date.now(),stock,buyDate,sellDate,cost,sale});
- localStorage.setItem(KEY,JSON.stringify(trades));
- $('stock').value='';$('costIn').value='';$('saleIn').value='';render();
+function prettyAuthError(e){
+ const c=e?.code||'';
+ return c.includes('invalid-credential')?'Username or password is incorrect.':
+ c.includes('email-already-in-use')?'That username is already taken.':
+ c.includes('weak-password')?'Use a stronger password (6+ characters).':
+ e?.message||'Something went wrong.'
 }
-function removeTrade(id){trades=trades.filter(t=>t.id!==id);localStorage.setItem(KEY,JSON.stringify(trades));render()}
+
+function appShell(){
+ root.innerHTML=`<main class="app">
+ <div class="topbar"><div class="brand"><div class="brandmark"><svg viewBox="0 0 48 48" fill="none"><path d="M8 35 18 25l8 7 14-19" stroke="#5ee6a4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="35" r="3" fill="#5ee6a4"/><circle cx="18" cy="25" r="3" fill="#5ee6a4"/><circle cx="26" cy="32" r="3" fill="#5ee6a4"/><circle cx="40" cy="13" r="3" fill="#5ee6a4"/></svg></div><div><h1>Booked Profit Tracker</h1><p>Realized returns, beautifully organized.</p></div></div><div class="status"><span class="dot"></span>Live sync</div><div class="top-actions"><button class="icon-btn" id="settingsBtn" title="Settings">⚙</button></div></div>
+ <section class="hero"><div class="hero-row"><div><h2>Your realized performance</h2><p>Only completed buy → sell trades count. Every phone signed into this account sees the same cloud data.</p><div class="hero-profit"><small>Total booked profit</small><span id="profit">₹0</span></div></div></div></section>
+ <div class="metrics"><div class="metric"><div class="k">Total cost</div><div class="v" id="cost">₹0</div></div><div class="metric"><div class="k">Total sale value</div><div class="v" id="sale">₹0</div></div><div class="metric"><div class="k">Realized XIRR</div><div class="v" id="xirr">—</div></div><div class="metric"><div class="k">Completed trades</div><div class="v" id="count">0</div></div></div>
+ <section class="card section"><div class="section-head"><div><h3 class="section-title">Add a sold trade</h3><p class="section-sub">Enter the ticker to show its company logo automatically.</p></div></div>
+ <div class="form-grid">
+  <div class="field company-wrap"><label>Share name / ticker</label><input id="stock" placeholder="TCS, RELIANCE, HBLENG" autocomplete="off"><div class="company-preview" id="preview">—</div></div>
+  <div class="field"><label>No. of shares</label><input id="qtyIn" type="number" min="0.0001" step="0.0001" placeholder="100"></div>
+  <div class="field"><label>Avg buy price ₹</label><input id="avgBuyIn" type="number" min="0.01" step=".01" placeholder="500"></div>
+  <div class="field"><label>Sell price ₹</label><input id="sellPriceIn" type="number" min="0" step=".01" placeholder="700"></div>
+  <div class="field"><label>Buy date</label><input id="buyDate" type="date"></div>
+  <div class="field"><label>Sell date</label><input id="sellDate" type="date"></div>
+  <div class="field"><label>Total buy value ₹</label><input id="costIn" type="number" readonly placeholder="Auto"></div>
+  <div class="field"><label>Total sell value ₹</label><input id="saleIn" type="number" readonly placeholder="Auto"></div>
+  <button class="primary" id="addBtn">+ Add trade</button>
+ </div><div class="helper">Total buy value = shares × average buy price. Total sell value = shares × sell price. Each trade shows booked profit, return %, and trade CAGR. Overall realized XIRR uses the total buy and sell cash flows on their actual dates.</div></section>
+ <section class="card section"><div class="section-head"><div><h3 class="section-title">Sold trades</h3><p class="section-sub">Newest sales first.</p></div><div><button class="secondary" id="exportBtn">Export</button></div></div><div class="trades" id="trades"></div></section>
+ <div class="footer">Signed in as ${esc(auth.currentUser?.displayName||'account')} · Cloud synchronized</div>
+ </main>`;
+ const now=new Date().toISOString().slice(0,10);buyDate.value=now;sellDate.value=now;
+ stock.addEventListener('input',()=>{const t=stock.value.trim().toUpperCase();preview.innerHTML=t?logoHtml({ticker:t,stock:t}):'—'});
+ const recalc=()=>{const q=Number(qtyIn.value||0),a=Number(avgBuyIn.value||0),sp=Number(sellPriceIn.value||0);costIn.value=q&&a?(q*a).toFixed(2):'';saleIn.value=q&&sp?(q*sp).toFixed(2):''};
+ [qtyIn,avgBuyIn,sellPriceIn].forEach(el=>el.addEventListener('input',recalc));
+ addBtn.onclick=addTrade;exportBtn.onclick=exportData;settingsBtn.onclick=openSettings;render();
+}
+async function addTrade(){
+ const ticker=stock.value.trim().toUpperCase().replace(/\s+/g,''),
+       b=buyDate.value,s=sellDate.value,
+       qty=Number(qtyIn.value),avgBuy=Number(avgBuyIn.value),sellPrice=Number(sellPriceIn.value),
+       c=qty*avgBuy,v=qty*sellPrice;
+ if(!ticker||!b||!s||!(qty>0)||!(avgBuy>0)||sellPrice<0)return alert('Please complete all fields.');
+ if(s<=b)return alert('Sell date must be after buy date.');
+ try{
+   await addDoc(collection(db,'users',auth.currentUser.uid,'trades'),{
+     ticker,stock:ticker,quantity:qty,avgBuy,sellPrice,buyDate:b,sellDate:s,cost:c,sale:v,
+     logoUrl:logoUrl(ticker),createdAt:serverTimestamp()
+   });
+   stock.value='';qtyIn.value='';avgBuyIn.value='';sellPriceIn.value='';costIn.value='';saleIn.value='';preview.textContent='—'
+ }catch(e){alert('Could not save trade. Check your internet connection.')}
+}
 function render(){
- const cost=trades.reduce((s,t)=>s+t.cost,0), sale=trades.reduce((s,t)=>s+t.sale,0), profit=sale-cost;
- $('cost').textContent=money(cost);$('sale').textContent=money(sale);$('profit').textContent=money(profit);$('profit').className='value '+(profit>=0?'positive':'negative');
- const flows=[];trades.forEach(t=>{flows.push({date:t.buyDate,amount:-t.cost});flows.push({date:t.sellDate,amount:t.sale})});
- const r=xirr(flows);$('xirr').textContent=r==null?'—':(r*100).toFixed(2)+'%';$('xirr').className='value '+(r!=null&&r>=0?'positive':'negative');
- if(!trades.length){$('table').innerHTML='<div class="empty">No sold trades yet.<br>Add your first completed trade above.</div>';return}
- $('table').innerHTML='<table><thead><tr><th>Stock</th><th>Buy date</th><th>Sell date</th><th>Cost</th><th>Sale</th><th>Booked profit</th><th>Return</th><th>CAGR</th><th></th></tr></thead><tbody>'+
- trades.slice().sort((a,b)=>b.sellDate.localeCompare(a.sellDate)).map(t=>{
-   const p=t.sale-t.cost, ret=t.cost?p/t.cost:null, c=tradeCagr(t);
-   return `<tr><td><b>${esc(t.stock)}</b></td><td>${fmt(t.buyDate)}</td><td>${fmt(t.sellDate)}</td><td>${money(t.cost)}</td><td>${money(t.sale)}</td><td class="${p>=0?'positive':'negative'}">${money(p)}</td><td>${ret==null?'—':(ret*100).toFixed(2)+'%'}</td><td>${c==null?'—':(c*100).toFixed(2)+'%'}</td><td><button class="danger" onclick="removeTrade(${t.id})">Delete</button></td></tr>`;
- }).join('')+'</tbody></table>';
+ const cost=trades.reduce((a,t)=>a+Number(t.cost||0),0),sale=trades.reduce((a,t)=>a+Number(t.sale||0),0),profit=sale-cost;
+ const p=document.getElementById('profit');if(!p)return;
+ document.getElementById('cost').textContent=money(cost);document.getElementById('sale').textContent=money(sale);p.textContent=money(profit);p.className=profit>=0?'pos':'neg';document.getElementById('count').textContent=trades.length;
+ const flows=[];trades.forEach(t=>{flows.push({date:t.buyDate,amount:-Number(t.cost)});flows.push({date:t.sellDate,amount:Number(t.sale)})});const r=xirr(flows);const xr=document.getElementById('xirr');xr.textContent=r==null?'—':(r*100).toFixed(2)+'%';xr.className=r!=null&&r>=0?'pos':'neg';
+ const box=document.getElementById('trades');if(!trades.length){box.innerHTML='<div class="empty"><div class="empty-icon">📊</div>No completed trades yet.<br>Add your first sold position above.</div>';return}
+ box.innerHTML=trades.slice().sort((a,b)=>(b.sellDate||'').localeCompare(a.sellDate||'')).map(t=>{
+   const qty=Number(t.quantity||1),avg=Number(t.avgBuy||t.cost||0),sp=Number(t.sellPrice??(qty?Number(t.sale||0)/qty:0)),
+         cost=Number(t.cost??qty*avg),sale=Number(t.sale??qty*sp),pr=sale-cost,
+         ret=cost?pr/cost:0,cr=cagr(t);
+   return `<div class="trade">
+     <div class="logo">${logoHtml(t)}</div>
+     <div class="trade-main"><b>${esc(t.ticker||t.stock)}</b><span>${fmt(t.buyDate)} → ${fmt(t.sellDate)} · ${qty} shares</span></div>
+     <div class="trade-stat"><span class="k">Avg buy · Sell</span><span class="v">₹${avg.toFixed(2)} · ₹${sp.toFixed(2)}</span></div>
+     <div class="trade-stat"><span class="k">Buy value · Sell value</span><span class="v">${money(cost)} · ${money(sale)}</span></div>
+     <div class="trade-stat"><span class="k">Profit · Return · CAGR</span><span class="v ${pr>=0?'pos':'neg'}">${money(pr)} · ${(ret*100).toFixed(2)}% · ${cr==null?'—':(cr*100).toFixed(2)+'%'}</span></div>
+     <button class="delete" data-id="${t.id}">Delete</button>
+   </div>`
+ }).join('');
+ box.querySelectorAll('.delete').forEach(b=>b.onclick=async()=>{if(confirm('Delete this trade?'))await deleteDoc(doc(db,'users',auth.currentUser.uid,'trades',b.dataset.id))});
 }
-function fmt(d){return new Date(d+'T00:00:00').toLocaleDateString('en-IN')}
-function exportData(){
- const blob=new Blob([JSON.stringify(trades,null,2)],{type:'application/json'});
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='booked-profit-trades.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+function exportData(){const blob=new Blob([JSON.stringify(trades,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='booked-profit-trades.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function openSettings(){
+ const back=document.createElement('div');back.className='modal-backdrop open';back.innerHTML=`<div class="modal"><button class="close" id="close">×</button><h3>Account & app</h3><p>Use the same username and password on every phone to keep trades synchronized live. No Gmail is required. Logo lookup uses your Logo.dev publishable key configured for this app.</p><div class="modal-row"><button class="secondary" id="signout">Sign out</button><button class="secondary" id="clearLocal">Clear old local data</button></div></div>`;document.body.appendChild(back);back.querySelector('#close').onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()};back.querySelector('#signout').onclick=()=>signOut(auth);
+ back.querySelector('#clearLocal').onclick=()=>{localStorage.removeItem('bookedProfitTracker.v2');alert('Old local-only data cleared from this phone.');};
 }
-function clearAll(){if(trades.length&&confirm('Delete all sold trades?')){trades=[];localStorage.setItem(KEY,'[]');render()}}
-$('buyDate').value=new Date().toISOString().slice(0,10);
-$('sellDate').value=new Date().toISOString().slice(0,10);
-render();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+function init(){
+ if(!CONFIG.firebase?.apiKey||CONFIG.firebase.apiKey.includes('PASTE_')){
+  root.innerHTML=`<main class="auth"><div class="auth-card"><div class="auth-logo">⚙️</div><h2>One-time setup needed</h2><p>The final multi-phone version is ready, but Firebase cloud credentials have not been added yet.</p><div class="setup-banner">Open <b>app-config.js</b> and add your Firebase web config plus your Logo.dev publishable key. Then every phone can sign in to the same account and see live data.</div></div></main>`;return;
+ }
+ app=initializeApp(CONFIG.firebase);auth=getAuth(app);db=getFirestore(app);
+ onAuthStateChanged(auth,user=>{if(!user){if(unsubscribe){unsubscribe();unsubscribe=null}authScreen('login');return}appShell();const q=query(collection(db,'users',user.uid,'trades'),orderBy('sellDate','desc'));unsubscribe=onSnapshot(q,s=>{trades=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed. Check Firebase security rules.'))});
+}
+init();
 </script>
 </body>
 </html>
