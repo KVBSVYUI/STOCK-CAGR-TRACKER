@@ -1,0 +1,23 @@
+name: Validate tracker
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check functions/index.js
+          node --check admin.js
+          node --check app-config.js
+      - name: Validate function dependencies
+        working-directory: functions
+        run: npm install --ignore-scripts
