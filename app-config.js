@@ -64,6 +64,7 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
       let a=document.getElementById('bptAccountButton');
       if(!a){a=document.createElement('button');a.id='bptAccountButton';a.type='button';a.className='icon';a.textContent='👤';a.title='Account';a.setAttribute('aria-label','Account');right.insertBefore(a,right.firstChild);a.onclick=account}
       const s=document.getElementById('settings');if(s)s.onclick=account;
+      const add=document.getElementById('addTradeOpen');if(add&&!add.dataset.bptStockHook){add.dataset.bptStockHook='1';add.addEventListener('click',()=>setTimeout(stockAutocomplete,0))}
       done=true;
     }
     stockAutocomplete();
