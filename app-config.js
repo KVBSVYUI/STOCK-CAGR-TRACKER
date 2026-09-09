@@ -5,6 +5,8 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
   const FIREBASE_APP='https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
   const FIREBASE_AUTH='https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
   const getAuth=async()=>{const [a,m]=await Promise.all([import(FIREBASE_APP),import(FIREBASE_AUTH)]);return m.getAuth(a.getApps()[0])};
+  const STOCK_BASE='https://dharunashokkumar.github.io/indian-listed-company-logos/';
+  let stockCatalogPromise=null;
   let done=false;
   function account(){
     document.querySelectorAll('.app-drawer,.modal-back').forEach(x=>x.remove());
@@ -25,6 +27,28 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
     document.getElementById('bptMenuMailbox').onclick=()=>alert('Mailbox will be connected after the click issue is fully fixed.');
     d.onclick=e=>{if(e.target===d)d.remove()};
   }
+  function loadStocks(){
+    if(stockCatalogPromise)return stockCatalogPromise;
+    stockCatalogPromise=fetch(STOCK_BASE+'data/logos.json',{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error('stock list unavailable');return r.json()}).then(data=>{
+      const seen=new Set();
+      return (data.logos||[]).map(x=>({ticker:String(x.ticker||'').toUpperCase(),name:String(x.company||x.name||x.ticker||''),exchange:String(x.exchange||'NSE').toUpperCase()})).filter(x=>x.ticker&&x.name).filter(x=>{const key=x.exchange+'|'+x.ticker;if(seen.has(key))return false;seen.add(key);return true});
+    }).catch(()=>[]);
+    return stockCatalogPromise;
+  }
+  function stockAutocomplete(){
+    const input=document.getElementById('mTicker');
+    if(!input||input.dataset.stockAutocomplete)return;
+    input.dataset.stockAutocomplete='1';
+    input.placeholder='Type company name or ticker';
+    const field=input.parentElement;field.style.position='relative';
+    const box=document.createElement('div');box.style.cssText='position:absolute;left:0;right:0;top:100%;margin-top:5px;background:#0b1421;border:1px solid #2a3a51;border-radius:12px;box-shadow:0 20px 45px #000b;z-index:1000;display:none;overflow:hidden;max-height:280px;overflow-y:auto';field.appendChild(box);
+    const clean=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    let catalog=[];
+    const render=items=>{box.innerHTML=items.slice(0,8).map((x,i)=>`<button type="button" data-stock-index="${i}" style="display:flex;width:100%;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid #202b3b;background:#0b1421;color:#f4f7fb;cursor:pointer"><span style="width:32px;height:32px;border-radius:8px;background:#172438;display:grid;place-items:center;overflow:hidden;flex:none;font-size:9px;font-weight:800"><img src="${STOCK_BASE+(x.exchange==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(x.ticker)+'.svg'}" style="width:100%;height:100%;object-fit:contain;background:#fff" onerror="this.style.display='none';this.parentElement.textContent='${clean(x.ticker).slice(0,2)}'"></span><span style="min-width:0"><b style="display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${clean(x.name)}</b><small style="display:block;color:#8997aa;margin-top:2px">${clean(x.ticker)} · ${clean(x.exchange)}</small></span></button>`).join('');box.style.display=items.length?'block':'none';box.querySelectorAll('[data-stock-index]').forEach(b=>b.onclick=()=>{const x=items[Number(b.dataset.stockIndex)];if(!x)return;input.value=x.ticker;input.dataset.selectedCompany=x.name;input.dataset.selectedExchange=x.exchange;box.style.display='none'})};
+    input.addEventListener('input',async()=>{const q=input.value.trim().toLowerCase();if(!q){box.style.display='none';return}catalog=await loadStocks();const matches=catalog.filter(x=>x.ticker.toLowerCase().startsWith(q)||x.name.toLowerCase().includes(q)).sort((a,b)=>{const score=x=>x.ticker.toLowerCase()===q?0:x.ticker.toLowerCase().startsWith(q)?1:x.name.toLowerCase().startsWith(q)?2:3;return score(a)-score(b)||a.name.localeCompare(b.name)});render(matches)});
+    input.addEventListener('focus',()=>{if(input.value.trim())input.dispatchEvent(new Event('input'))});
+    document.addEventListener('click',e=>{if(!field.contains(e.target))box.style.display='none'});
+  }
   function apply(){
     const p=document.querySelector('.auth-card p');
     if(p&&!p.dataset.bptFixed){p.textContent='Sign in to securely track your booked profits, trade history and performance.';p.dataset.bptFixed='1'}
@@ -42,6 +66,7 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
       const s=document.getElementById('settings');if(s)s.onclick=account;
       done=true;
     }
+    stockAutocomplete();
   }
   function start(){apply();let n=0;const timer=setInterval(()=>{apply();if(++n>=80||done)clearInterval(timer)},250)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
