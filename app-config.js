@@ -10,7 +10,7 @@ window.APP_CONFIG = {
   logoDevToken: ""
 };
 
-// Use the new puppy icon anywhere the app renders its built-in brand mark.
+// Branding and small authentication UI enhancements.
 document.addEventListener('DOMContentLoaded', () => {
   const applyPuppyLogo = () => {
     document.querySelectorAll('.mark, .auth-mark').forEach(el => {
@@ -36,9 +36,64 @@ document.addEventListener('DOMContentLoaded', () => {
     text.dataset.customLoginMessage = '1';
   };
 
+  const addPasswordRecovery = () => {
+    const authCard = document.querySelector('.auth-card');
+    if (!authCard || authCard.dataset.passwordRecoveryAdded === '1') return;
+
+    const inputs = authCard.querySelectorAll('input');
+    if (!inputs.length) return;
+    const passwordInput = Array.from(inputs).find(input => /password/i.test(input.type) || /password/i.test(input.placeholder || '') || /password/i.test(input.name || ''));
+    if (!passwordInput) return;
+
+    const usernameInput = Array.from(inputs).find(input => input !== passwordInput && /user|name/i.test((input.placeholder || '') + ' ' + (input.name || '') + ' ' + (input.type || '')));
+    if (!usernameInput) return;
+
+    const row = document.createElement('div');
+    row.style.marginTop = '8px';
+    row.style.textAlign = 'right';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'Forgot password?';
+    button.style.background = 'none';
+    button.style.border = '0';
+    button.style.padding = '4px 0';
+    button.style.cursor = 'pointer';
+    button.style.font = 'inherit';
+    button.style.fontWeight = '600';
+    button.style.color = 'var(--accent, #45d6c8)';
+
+    button.addEventListener('click', async () => {
+      const username = String(usernameInput.value || '').trim().toLowerCase();
+      if (!username) {
+        alert('Enter your username first.');
+        usernameInput.focus();
+        return;
+      }
+
+      const email = username + '@bookedprofittracker.app';
+      try {
+        if (typeof window.firebaseAuth === 'undefined') {
+          alert('Please wait a moment and try again.');
+          return;
+        }
+        await window.firebaseAuth.sendPasswordResetEmail(email);
+        alert('Password reset instructions have been sent to the email address connected to this account.');
+      } catch (error) {
+        console.error(error);
+        alert('Unable to send the reset email. Please check your username and try again.');
+      }
+    });
+
+    row.appendChild(button);
+    passwordInput.parentElement?.after(row);
+    authCard.dataset.passwordRecoveryAdded = '1';
+  };
+
   const applyBranding = () => {
     applyPuppyLogo();
     applyLoginMessage();
+    addPasswordRecovery();
   };
 
   applyBranding();
