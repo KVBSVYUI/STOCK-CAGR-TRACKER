@@ -1,6 +1,6 @@
 window.APP_CONFIG = {
   firebase: {
-    apiKey: "AIzaSyAokMEP3H6180gHAMLSoQcbFVE_DtPAiig",
+    apiKey: "AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",
     authDomain: "booked-profit-tracker.firebaseapp.com",
     projectId: "booked-profit-tracker",
     storageBucket: "booked-profit-tracker.firebasestorage.app",
