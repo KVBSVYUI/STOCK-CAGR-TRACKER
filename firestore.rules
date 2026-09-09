@@ -3,12 +3,24 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Users can access only their own trades and charges.
-    // A Firebase Auth custom claim (admin: true) grants owner/admin access.
+    // Admins can access these paths through the authenticated admin claim.
     match /users/{userId}/{collectionName}/{documentId} {
       allow read, write: if request.auth != null
                          && (request.auth.uid == userId
                              || request.auth.token.admin == true)
                          && collectionName in ['trades', 'charges'];
+    }
+
+    // Announcements are visible to signed-in users. Only admins may write them.
+    match /announcements/{announcementId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth != null
+                                    && request.auth.token.admin == true;
+    }
+
+    // Each user's mailbox read-state is private to that user.
+    match /users/{userId}/mailboxState/{messageId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
