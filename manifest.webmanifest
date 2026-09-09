@@ -1,0 +1,10 @@
+{
+  "name": "Booked Profit Tracker",
+  "short_name": "Profit Tracker",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#09111f",
+  "theme_color": "#0b1220",
+  "description": "Track booked stock profits, trade CAGR and overall realized XIRR.",
+  "icons": []
+}

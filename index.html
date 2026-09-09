@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="Track booked stock profits, trade CAGR and overall realized XIRR.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Booked Profit Tracker</title>
+<style>
+:root{--bg:#09111f;--card:#111a2b;--card2:#172238;--text:#f5f7fb;--muted:#9aa7bd;--line:#26344d;--accent:#67e8a5;--danger:#ff7777;--blue:#78a9ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#08101d,#101b2e);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1050px;margin:auto;padding:18px 14px 50px}.hero{padding:8px 3px 18px}.hero h1{font-size:28px;margin:0 0 5px}.hero p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{background:rgba(17,26,43,.96);border:1px solid var(--line);border-radius:16px;padding:15px}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.value{font-size:23px;font-weight:800;margin-top:7px}.positive{color:var(--accent)}.negative{color:var(--danger)}
+.form-card,.section{margin-top:12px}.section-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.section h2,.form-card h2{font-size:18px;margin:0}.hint{font-size:11px;color:var(--muted)}
+.form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:9px;align-items:end}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.field input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0b1322;color:var(--text);font-size:14px;outline:0}.field input:focus{border-color:var(--blue)}
+button{padding:11px 14px;border-radius:10px;border:0;font-weight:750;cursor:pointer}.add{background:var(--accent);color:#06130d}.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}.danger{background:transparent;color:var(--danger);padding:5px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:850px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{color:var(--muted);font-size:10px;text-transform:uppercase}tr:last-child td{border-bottom:0}.empty{padding:32px;text-align:center;color:var(--muted)}
+.tools{display:flex;gap:7px}.note{margin-top:12px;color:var(--muted);font-size:11px;line-height:1.5}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
+@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr 1fr}.form button{width:100%}}
+@media(max-width:500px){main{padding:14px 10px 35px}.hero h1{font-size:24px}.grid{gap:7px}.card{padding:12px}.value{font-size:18px}.form{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.tools{width:100%}.tools button{flex:1}}
+</style>
+</head>
+<body>
+<main>
+<div class="hero">
+<h1>📈 Booked Profit Tracker</h1>
+<p>Track only stocks you have sold — profit, trade CAGR and overall realized XIRR.</p>
+</div>
+
+<div class="grid">
+<div class="card"><div class="label">Booked profit</div><div class="value" id="profit">₹0</div></div>
+<div class="card"><div class="label">Total cost</div><div class="value" id="cost">₹0</div></div>
+<div class="card"><div class="label">Total sale value</div><div class="value" id="sale">₹0</div></div>
+<div class="card"><div class="label">Realized XIRR</div><div class="value" id="xirr">—</div></div>
+</div>
+
+<div class="card form-card">
+<div class="section-head">
+<h2>Add a sold trade</h2>
+<span class="hint">Use the actual buy and sell dates.</span>
+</div>
+<div class="form">
+<div class="field"><label>Stock</label><input id="stock" placeholder="e.g. TCS"></div>
+<div class="field"><label>Buy date</label><input id="buyDate" type="date"></div>
+<div class="field"><label>Sell date</label><input id="sellDate" type="date"></div>
+<div class="field"><label>Cost / buy amount ₹</label><input id="costIn" type="number" min="0" step="0.01" placeholder="50000"></div>
+<div class="field"><label>Sale amount ₹</label><input id="saleIn" type="number" min="0" step="0.01" placeholder="70000"></div>
+<button class="add" onclick="addTrade()">+ Add</button>
+</div>
+<div class="note">CAGR is calculated for each completed trade. Overall XIRR uses each buy amount as a cash outflow on the buy date and each sale amount as an inflow on the sell date. This is the meaningful way to annualize realized returns; a profit amount by itself cannot have a CAGR/XIRR.</div>
+</div>
+
+<div class="section">
+<div class="section-head">
+<h2>Sold trades</h2>
+<div class="tools"><button class="secondary" onclick="exportData()">Export</button><button class="secondary" onclick="clearAll()">Clear all</button></div>
+</div>
+<div class="table-wrap" id="table"></div>
+</div>
+
+<div class="footer">Your trades are stored locally in this browser/device. No broker login or API key is required.</div>
+</main>
+
+<script>
+const KEY='bookedProfitTracker.v2';
+let trades=JSON.parse(localStorage.getItem(KEY)||'[]');
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n||0);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function years(a,b){return (new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/31536000000}
+function tradeCagr(t){
+ const y=years(t.buyDate,t.sellDate);
+ if(y<=0||t.cost<=0||t.sale<0)return null;
+ return Math.pow(t.sale/t.cost,1/y)-1;
+}
+function xnpv(rate,flows){
+ const t0=new Date(flows[0].date+'T00:00:00');
+ return flows.reduce((s,f)=>s+f.amount/Math.pow(1+rate,(new Date(f.date+'T00:00:00')-t0)/31536000000),0);
+}
+function xirr(flows){
+ if(flows.length<2||!flows.some(x=>x.amount<0)||!flows.some(x=>x.amount>0))return null;
+ flows=[...flows].sort((a,b)=>a.date.localeCompare(b.date));
+ let lo=-0.999999,hi=1;
+ while(xnpv(hi,flows)>0 && hi<1e8)hi*=2;
+ if(xnpv(hi,flows)>0)return null;
+ for(let i=0;i<150;i++){let mid=(lo+hi)/2;if(xnpv(mid,flows)>0)lo=mid;else hi=mid}
+ return (lo+hi)/2;
+}
+function addTrade(){
+ const stock=$('stock').value.trim().toUpperCase(), buyDate=$('buyDate').value, sellDate=$('sellDate').value;
+ const cost=Number($('costIn').value), sale=Number($('saleIn').value);
+ if(!stock||!buyDate||!sellDate||!(cost>0)||sale<0){alert('Please fill every field correctly.');return}
+ if(sellDate<=buyDate){alert('Sell date must be after buy date.');return}
+ trades.push({id:Date.now(),stock,buyDate,sellDate,cost,sale});
+ localStorage.setItem(KEY,JSON.stringify(trades));
+ $('stock').value='';$('costIn').value='';$('saleIn').value='';render();
+}
+function removeTrade(id){trades=trades.filter(t=>t.id!==id);localStorage.setItem(KEY,JSON.stringify(trades));render()}
+function render(){
+ const cost=trades.reduce((s,t)=>s+t.cost,0), sale=trades.reduce((s,t)=>s+t.sale,0), profit=sale-cost;
+ $('cost').textContent=money(cost);$('sale').textContent=money(sale);$('profit').textContent=money(profit);$('profit').className='value '+(profit>=0?'positive':'negative');
+ const flows=[];trades.forEach(t=>{flows.push({date:t.buyDate,amount:-t.cost});flows.push({date:t.sellDate,amount:t.sale})});
+ const r=xirr(flows);$('xirr').textContent=r==null?'—':(r*100).toFixed(2)+'%';$('xirr').className='value '+(r!=null&&r>=0?'positive':'negative');
+ if(!trades.length){$('table').innerHTML='<div class="empty">No sold trades yet.<br>Add your first completed trade above.</div>';return}
+ $('table').innerHTML='<table><thead><tr><th>Stock</th><th>Buy date</th><th>Sell date</th><th>Cost</th><th>Sale</th><th>Booked profit</th><th>Return</th><th>CAGR</th><th></th></tr></thead><tbody>'+
+ trades.slice().sort((a,b)=>b.sellDate.localeCompare(a.sellDate)).map(t=>{
+   const p=t.sale-t.cost, ret=t.cost?p/t.cost:null, c=tradeCagr(t);
+   return `<tr><td><b>${esc(t.stock)}</b></td><td>${fmt(t.buyDate)}</td><td>${fmt(t.sellDate)}</td><td>${money(t.cost)}</td><td>${money(t.sale)}</td><td class="${p>=0?'positive':'negative'}">${money(p)}</td><td>${ret==null?'—':(ret*100).toFixed(2)+'%'}</td><td>${c==null?'—':(c*100).toFixed(2)+'%'}</td><td><button class="danger" onclick="removeTrade(${t.id})">Delete</button></td></tr>`;
+ }).join('')+'</tbody></table>';
+}
+function fmt(d){return new Date(d+'T00:00:00').toLocaleDateString('en-IN')}
+function exportData(){
+ const blob=new Blob([JSON.stringify(trades,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='booked-profit-trades.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+function clearAll(){if(trades.length&&confirm('Delete all sold trades?')){trades=[];localStorage.setItem(KEY,'[]');render()}}
+$('buyDate').value=new Date().toISOString().slice(0,10);
+$('sellDate').value=new Date().toISOString().slice(0,10);
+render();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
