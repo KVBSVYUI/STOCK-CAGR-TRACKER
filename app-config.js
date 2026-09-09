@@ -27,6 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
       el.appendChild(img);
     });
   };
-  applyPuppyLogo();
-  new MutationObserver(applyPuppyLogo).observe(document.body, {childList: true, subtree: true});
+
+  const applyLoginMessage = () => {
+    const text = document.querySelector('.auth-card p');
+    if (!text) return;
+    if (text.dataset.customLoginMessage === '1') return;
+    text.textContent = 'Sign in to securely track your booked profits, trade history and performance.';
+    text.dataset.customLoginMessage = '1';
+  };
+
+  const applyBranding = () => {
+    applyPuppyLogo();
+    applyLoginMessage();
+  };
+
+  applyBranding();
+  new MutationObserver(applyBranding).observe(document.body, {childList: true, subtree: true});
 });
