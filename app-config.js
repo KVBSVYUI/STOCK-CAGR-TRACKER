@@ -9,3 +9,24 @@ window.APP_CONFIG = {
   },
   logoDevToken: ""
 };
+
+// Use the new puppy icon anywhere the app renders its built-in brand mark.
+document.addEventListener('DOMContentLoaded', () => {
+  const applyPuppyLogo = () => {
+    document.querySelectorAll('.mark, .auth-mark').forEach(el => {
+      if (el.dataset.puppyLogo === '1') return;
+      el.dataset.puppyLogo = '1';
+      el.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = './icons/icon-192.png';
+      img.alt = 'Booked Profit Tracker';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = 'inherit';
+      el.appendChild(img);
+    });
+  };
+  applyPuppyLogo();
+  new MutationObserver(applyPuppyLogo).observe(document.body, {childList: true, subtree: true});
+});
