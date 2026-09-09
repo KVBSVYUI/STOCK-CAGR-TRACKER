@@ -3,190 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08111f">
-<meta name="description" content="Booked Profit Tracker — realized stock profits, trade CAGR and XIRR.">
+<meta name="theme-color" content="#070b12">
+<meta name="description" content="Booked Profit Tracker — clean realized stock profit tracking with live cloud sync.">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Booked Profit Tracker</title>
 <style>
-:root{
- --bg:#070d18;--panel:#0d1728;--panel2:#111f34;--line:#21314b;--text:#f7f9fc;--muted:#8fa1ba;
- --green:#5ee6a4;--green2:#24b878;--red:#ff6f7d;--blue:#76a9ff;--gold:#f7c873;
- --shadow:0 18px 50px rgba(0,0,0,.25);--radius:20px;
-}
-*{box-sizing:border-box}html{background:var(--bg)}
-body{margin:0;background:radial-gradient(circle at 20% 0%,#12243b 0,#070d18 38%,#050a12 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input{font:inherit}button{cursor:pointer}
-.app{max-width:1120px;margin:auto;padding:18px 16px 56px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:5px 0 20px}
-.brand{display:flex;align-items:center;gap:12px}.brandmark{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#17324e,#0e1b2d);border:1px solid #2b4565;display:grid;place-items:center;box-shadow:0 10px 30px #0004}
-.brandmark svg{width:31px}.brand h1{font-size:18px;margin:0;letter-spacing:-.02em}.brand p{margin:3px 0 0;color:var(--muted);font-size:11px}
-.top-actions{display:flex;gap:8px}.icon-btn{width:42px;height:42px;border:1px solid var(--line);background:#0d1727;color:var(--text);border-radius:13px;display:grid;place-items:center}
-.status{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);margin-left:auto;margin-right:8px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
-.hero{background:linear-gradient(135deg,#10233b,#0b1627 55%,#0b1b25);border:1px solid #1d3450;border-radius:24px;padding:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-90px;top:-110px;background:#36d58c18;filter:blur(4px)}
-.hero h2{margin:0;font-size:26px;letter-spacing:-.04em}.hero p{margin:7px 0 0;color:var(--muted);max-width:620px;font-size:13px;line-height:1.55}
-.hero-row{display:flex;justify-content:space-between;align-items:end;gap:20px;position:relative;z-index:1}.hero-profit{font-size:36px;font-weight:850;letter-spacing:-.04em;margin-top:16px}.hero-profit small{font-size:11px;color:var(--muted);font-weight:650;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:3px}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.metric{background:#0c1626cc;border:1px solid var(--line);border-radius:17px;padding:14px}.metric .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.metric .v{font-size:20px;font-weight:800;margin-top:6px}.pos{color:var(--green)}.neg{color:var(--red)}
-.card{background:linear-gradient(180deg,#0e192a,#0b1422);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.section{margin-top:14px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 18px 12px}.section-title{margin:0;font-size:16px}.section-sub{margin:4px 0 0;font-size:11px;color:var(--muted)}
-.primary{border:0;background:linear-gradient(135deg,#67eca9,#39c985);color:#04120b;font-weight:850;border-radius:12px;padding:11px 15px;box-shadow:0 10px 24px #32d18b20}
-.secondary{border:1px solid var(--line);background:#111e31;color:var(--text);font-weight:700;border-radius:11px;padding:10px 13px}
-.form-grid{padding:0 18px 18px;display:grid;grid-template-columns:1.25fr .75fr .9fr .9fr .9fr 1fr 1fr auto;gap:9px;align-items:end}
-.field label{display:block;color:var(--muted);font-size:10px;margin:0 0 5px}.field input{width:100%;border:1px solid var(--line);background:#07111f;color:var(--text);border-radius:11px;padding:11px 10px;outline:none}.field input:focus{border-color:#568fe5;box-shadow:0 0 0 3px #568fe51c}
-.company-wrap{position:relative}.company-preview{position:absolute;right:7px;bottom:7px;width:27px;height:27px;border-radius:8px;overflow:hidden;background:#17253a;display:grid;place-items:center;font-size:9px;font-weight:800;color:#bcd0ea}.company-preview img{width:100%;height:100%;object-fit:contain;background:#fff}
-.helper{padding:0 18px 17px;color:var(--muted);font-size:10px;line-height:1.5}
-.trades{padding:0 14px 14px}.trade{display:grid;grid-template-columns:48px minmax(150px,1.7fr) 1fr 1fr 1fr 70px;gap:12px;align-items:center;padding:14px 8px;border-top:1px solid var(--line)}.logo{width:44px;height:44px;border-radius:13px;background:#152238;border:1px solid #263a57;display:grid;place-items:center;overflow:hidden;font-size:12px;font-weight:850;color:#bcd0e9}.logo img{width:100%;height:100%;object-fit:contain;background:#fff}.trade-main b{font-size:14px}.trade-main span{display:block;color:var(--muted);font-size:10px;margin-top:3px}.trade-stat .k{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.06em}.trade-stat .v{display:block;font-weight:750;font-size:12px;margin-top:3px}.delete{border:0;background:transparent;color:#788ba7;font-size:11px}.delete:hover{color:var(--red)}
-.empty{padding:35px 20px;text-align:center;color:var(--muted);font-size:12px}.empty-icon{font-size:34px;margin-bottom:8px}
-.footer{margin-top:18px;text-align:center;color:#61738d;font-size:10px}
-.modal-backdrop{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;justify-content:center;padding:14px;z-index:20}.modal-backdrop.open{display:flex}.modal{width:min(520px,100%);background:#0c1728;border:1px solid #28405e;border-radius:22px;padding:20px;box-shadow:0 30px 80px #0009}.modal h3{margin:0 0 5px}.modal p{font-size:11px;color:var(--muted);line-height:1.5}.modal-row{display:flex;gap:8px;margin-top:12px}.modal-row input{flex:1}.modal input{border:1px solid var(--line);background:#07111f;color:var(--text);border-radius:11px;padding:11px;outline:0;width:100%}.close{float:right;border:0;background:transparent;color:var(--muted);font-size:22px}
-.auth{min-height:100dvh;display:grid;place-items:center;padding:18px}.auth-card{width:min(430px,100%);padding:25px;border-radius:25px;background:linear-gradient(180deg,#101d31,#0a1321);border:1px solid #263b57;box-shadow:var(--shadow)}.auth-logo{width:62px;height:62px;border-radius:18px;background:#142943;display:grid;place-items:center;margin-bottom:18px}.auth h2{margin:0;font-size:25px}.auth p{color:var(--muted);font-size:12px;line-height:1.5}.auth .field{margin-top:12px}.auth-actions{display:grid;gap:8px;margin-top:15px}.error{color:var(--red);font-size:11px;min-height:15px;margin-top:8px}
-.setup-banner{margin-top:12px;padding:13px 15px;border:1px solid #5b4b25;background:#2a2413;color:#e9d8a4;border-radius:15px;font-size:11px;line-height:1.5}
-@media(max-width:1050px){.form-grid{grid-template-columns:1fr 1fr 1fr 1fr}.form-grid .primary{width:100%}.trade{grid-template-columns:48px 1.5fr 1fr 1fr 1fr}.trade .delete{grid-column:5;justify-self:end}.trade-stat:nth-of-type(4){display:none}}
-@media(max-width:620px){.app{padding:12px 10px 45px}.topbar{padding-bottom:14px}.status{display:none}.brandmark{width:43px;height:43px}.hero{padding:19px}.hero h2{font-size:22px}.hero-profit{font-size:31px}.metrics{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr 1fr}.form-grid .field:first-child{grid-column:1/-1}.form-grid .primary{grid-column:1/-1}.form-grid .field{min-width:0}.trade{grid-template-columns:42px 1fr auto;gap:9px;padding:13px 5px}.logo{width:39px;height:39px}.trade-stat{display:none!important}.trade .delete{grid-column:auto}.section-head{padding:15px 14px 10px}}
+:root{--bg:#070b12;--panel:#0d131d;--panel2:#111925;--line:#202b3b;--line2:#2a374a;--text:#f4f7fb;--muted:#8997aa;--green:#42df9b;--green2:#20bd7b;--red:#ff7180;--blue:#79a9ff;--gold:#e9c36d;--shadow:0 20px 60px #0007;--r:20px}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(900px 500px at 12% -5%,#132238 0,#070b12 55%);min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}.app{width:min(980px,100%);margin:auto;padding:18px 16px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:11px}.mark{width:44px;height:44px;border-radius:14px;background:#101b2a;border:1px solid #26364d;display:grid;place-items:center}.mark svg{width:27px}.brand h1{font-size:17px;margin:0;letter-spacing:-.02em}.brand p{font-size:10px;color:var(--muted);margin:2px 0 0}.right{display:flex;align-items:center;gap:9px}.sync{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px #42df9b}.icon{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#0d141f;color:var(--text)}
+.hero{border:1px solid #223149;background:linear-gradient(135deg,#111e31,#0b111b 65%);border-radius:24px;padding:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:230px;height:230px;border-radius:50%;right:-110px;top:-130px;background:#42df9b13}.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;position:relative;z-index:1}.eyebrow{font-size:10px;color:#91a4be;text-transform:uppercase;letter-spacing:.1em;font-weight:750}.profit{font-size:42px;font-weight:900;letter-spacing:-.055em;margin-top:6px}.profit.pos{color:var(--green)}.profit.neg{color:var(--red)}.year{background:#0b1421;border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:10px 13px;min-width:105px;outline:none;font-weight:750}.year:focus{border-color:#5d8ee2}.hero-sub{margin:5px 0 0;color:var(--muted);font-size:11px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}.kpi{background:#0b121d;border:1px solid var(--line);border-radius:15px;padding:13px}.kpi .label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.kpi .value{font-size:17px;font-weight:850;margin-top:5px}.kpi .hint{font-size:9px;color:#63738a;margin-top:3px}.pos{color:var(--green)}.neg{color:var(--red)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.primary,.secondary{border-radius:12px;padding:10px 14px;font-weight:800;border:1px solid var(--line2)}.primary{background:linear-gradient(135deg,#56e6a4,#2ac785);color:#06120c;border:0}.secondary{background:#0e1724;color:var(--text)}
+.section{margin-top:14px}.card{background:linear-gradient(180deg,#0d141f,#0a1018);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 35px #0003}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 18px 12px}.title{margin:0;font-size:15px}.sub{margin:4px 0 0;color:var(--muted);font-size:10px}.charges-line{display:flex;align-items:center;justify-content:space-between;padding:0 18px 15px;color:var(--muted);font-size:10px}.charges-line b{font-size:13px;color:var(--text)}
+.trades{padding:0 12px 12px}.trade{display:grid;grid-template-columns:48px minmax(170px,1.5fr) 1fr 1fr 115px 32px;gap:12px;align-items:center;padding:14px 7px;border-top:1px solid var(--line)}.trade-main b{font-size:13px}.trade-main span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.logo{width:42px;height:42px;border-radius:12px;background:#142033;border:1px solid #263a54;display:grid;place-items:center;overflow:hidden;font-size:11px;font-weight:850;color:#b9c9dc}.logo img{width:100%;height:100%;object-fit:contain;background:#fff}.stat .k{display:block;font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.stat .v{display:block;font-size:11px;font-weight:760;margin-top:4px}.trade-result{text-align:right}.trade-result .profit{font-size:13px;letter-spacing:0;margin:0}.return{font-size:10px;margin-top:3px;font-weight:800}.delete{border:0;background:transparent;color:#687990;font-size:16px}.delete:hover{color:var(--red)}.empty{text-align:center;padding:42px 20px;color:var(--muted);font-size:11px}.empty strong{display:block;color:var(--text);margin-bottom:4px}
+.form{padding:0 18px 18px;display:grid;grid-template-columns:1.4fr .7fr .9fr .9fr 1fr 1fr;gap:10px}.field label{display:block;color:var(--muted);font-size:9px;margin:0 0 5px}.field input{width:100%;background:#080f19;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:11px 10px;outline:none}.field input:focus{border-color:#5d8ee2;box-shadow:0 0 0 3px #5d8ee21a}.company{position:relative}.preview{position:absolute;right:6px;bottom:6px;width:28px;height:28px;border-radius:8px;background:#172438;overflow:hidden;display:grid;place-items:center;font-size:9px;font-weight:850}.preview img{width:100%;height:100%;object-fit:contain;background:#fff}.form .full{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px}.auto{color:#73849b;font-size:10px;padding-top:8px}.hintline{grid-column:1/-1;color:#66778f;font-size:9px;line-height:1.5}
+.modal-back{position:fixed;inset:0;background:#000b;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:50}.modal-back.open{display:flex}.modal{width:min(560px,100%);max-height:90dvh;overflow:auto;background:#0c141f;border:1px solid #2a3a51;border-radius:22px;padding:20px;box-shadow:0 30px 90px #000b}.modal h3{margin:0;font-size:18px}.modal p{color:var(--muted);font-size:11px;line-height:1.5}.close{float:right;border:0;background:transparent;color:#8291a6;font-size:24px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.modal-grid .field.full{grid-column:1/-1}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.detail-head{display:flex;align-items:center;gap:12px;margin-top:12px}.detail-logo{width:52px;height:52px;border-radius:15px;background:#17253a;overflow:hidden;display:grid;place-items:center;font-weight:850}.detail-logo img{width:100%;height:100%;object-fit:contain;background:#fff}.detail-name b{font-size:17px}.detail-name span{display:block;color:var(--muted);font-size:10px;margin-top:3px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.detail-item{background:#0a111b;border:1px solid var(--line);border-radius:13px;padding:11px}.detail-item span{display:block;color:var(--muted);font-size:9px}.detail-item b{display:block;margin-top:4px;font-size:13px}
+.auth{min-height:100dvh;display:grid;place-items:center;padding:18px}.auth-card{width:min(420px,100%);background:#0d151f;border:1px solid #26374e;border-radius:24px;padding:25px;box-shadow:var(--shadow)}.auth-mark{width:58px;height:58px;border-radius:17px;background:#132239;display:grid;place-items:center;margin-bottom:17px}.auth h2{margin:0;font-size:24px}.auth p{color:var(--muted);font-size:11px;line-height:1.5}.auth .field{margin-top:12px}.auth-actions{display:grid;gap:8px;margin-top:15px}.error{min-height:15px;color:var(--red);font-size:10px;margin-top:7px}.foot{margin-top:17px;text-align:center;color:#5f7088;font-size:9px}
+@media(max-width:800px){.trade{grid-template-columns:44px 1fr 120px 32px}.trade .stat{display:none}.trade-result{text-align:right}.form{grid-template-columns:1fr 1fr 1fr}.form .company{grid-column:1/-1}.form .full{grid-column:1/-1}.kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.app{padding:12px 10px 42px}.top{margin-bottom:12px}.sync{display:none}.hero{padding:18px}.hero-top{display:block}.year{margin-top:13px}.profit{font-size:36px}.kpis{gap:7px}.kpi{padding:11px}.kpi .value{font-size:15px}.form{grid-template-columns:1fr 1fr}.section-head{padding:15px 14px 11px}.trades{padding:0 9px 9px}.trade{grid-template-columns:42px 1fr auto;gap:9px;padding:13px 4px}.logo{width:39px;height:39px}.trade-result .profit{font-size:12px}.trade-main b{font-size:12px}.detail-grid,.modal-grid{grid-template-columns:1fr}.modal-grid .field.full{grid-column:auto}.hero-sub{max-width:310px}}
 </style>
 <script src="app-config.js"></script>
 </head>
-<body>
-<div id="root"></div>
-
+<body><div id="root"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile,signOut} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import {getFirestore,collection,addDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
-const CONFIG = window.APP_CONFIG || {};
-const root=document.getElementById('root');
-const localKey='bookedProfitTracker.v3';
-let app,auth,db,unsubscribe=null,trades=[];
+const CONFIG=window.APP_CONFIG||{},root=document.getElementById('root');let app,auth,db,unsubTrades=null,unsubCharges=null,trades=[],charges=[],selectedYear='all';
 const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const fmt=d=>new Date(d+'T00:00:00').toLocaleDateString('en-IN');
-const years=(a,b)=>(new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/31536000000;
-function cagr(t){const y=years(t.buyDate,t.sellDate);return y>0&&t.cost>0?Math.pow(t.sale/t.cost,1/y)-1:null}
-function xnpv(r,flows){const t0=new Date(flows[0].date+'T00:00:00');return flows.reduce((s,f)=>s+f.amount/Math.pow(1+r,(new Date(f.date+'T00:00:00')-t0)/31536000000),0)}
-function xirr(flows){if(flows.length<2||!flows.some(x=>x.amount<0)||!flows.some(x=>x.amount>0))return null;flows=[...flows].sort((a,b)=>a.date.localeCompare(b.date));let lo=-.999999,hi=1;while(xnpv(hi,flows)>0&&hi<1e8)hi*=2;if(xnpv(hi,flows)>0)return null;for(let i=0;i<160;i++){let m=(lo+hi)/2;if(xnpv(m,flows)>0)lo=m;else hi=m}return(lo+hi)/2}
-function initials(s){return String(s||'?').replace(/[^A-Z0-9]/gi,'').slice(0,2).toUpperCase()||'?'}
-function logoUrl(ticker){const token=CONFIG.logoDevToken||'';if(!token||!ticker)return '';return `https://img.logo.dev/ticker/${encodeURIComponent(ticker.toUpperCase())}.IN?token=${encodeURIComponent(token)}&size=96&format=png`}
-function logoHtml(t){const u=t.logoUrl||logoUrl(t.ticker||t.stock);return u?`<img src="${u}" alt="" onerror="this.remove()">`:`<span>${initials(t.ticker||t.stock)}</span>`}
-
-function authId(username){
- const u=String(username||'').trim().toLowerCase();
- return u+'@bookedprofittracker.app';
-}
-function validUsername(u){
- return /^[a-zA-Z0-9_]{3,24}$/.test(u);
-}
-function authScreen(mode='login',msg=''){
- root.innerHTML=`<main class="auth"><div class="auth-card">
- <div class="auth-logo"><svg width="38" viewBox="0 0 48 48" fill="none"><path d="M9 34 19 24l8 7 12-17" stroke="#5ee6a4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="34" r="3" fill="#5ee6a4"/><circle cx="19" cy="24" r="3" fill="#5ee6a4"/><circle cx="27" cy="31" r="3" fill="#5ee6a4"/><circle cx="39" cy="14" r="3" fill="#5ee6a4"/></svg></div>
- <h2>${mode==='login'?'Welcome back':'Create your account'}</h2>
- <p>${mode==='login'?'Sign in on any phone using your username and password. No Gmail is required.':'Create a private cloud account using only a username and password.'}</p>
- <div class="field"><label>Username</label><input id="username" type="text" autocomplete="username" autocapitalize="none" placeholder="e.g. mohit123"></div>
- <div class="field"><label>Password</label><input id="password" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}" placeholder="Minimum 6 characters"></div>
- <div class="error">${esc(msg)}</div>
- <div class="auth-actions"><button class="primary" id="authBtn">${mode==='login'?'Sign in':'Create account'}</button>
- <button class="secondary" id="switchBtn">${mode==='login'?'New here? Create account':'Already have an account? Sign in'}</button></div>
- </div></main>`;
- document.getElementById('switchBtn').onclick=()=>authScreen(mode==='login'?'signup':'login');
- document.getElementById('authBtn').onclick=async()=>{
-   const u=username.value.trim(),p=password.value;
-   if(!validUsername(u))return authScreen(mode,'Username must be 3–24 characters: letters, numbers or underscore.');
-   if(p.length<6)return authScreen(mode,'Password must be at least 6 characters.');
-   try{
-     const e=authId(u);
-     if(mode==='login'){
-       await signInWithEmailAndPassword(auth,e,p);
-     }else{
-       const cred=await createUserWithEmailAndPassword(auth,e,p);
-       await updateProfile(cred.user,{displayName:u});
-     }
-   }catch(err){authScreen(mode,prettyAuthError(err))}
- };
-}
-function prettyAuthError(e){
- const c=e?.code||'';
- return c.includes('invalid-credential')?'Username or password is incorrect.':
- c.includes('email-already-in-use')?'That username is already taken.':
- c.includes('weak-password')?'Use a stronger password (6+ characters).':
- e?.message||'Something went wrong.'
-}
-
-function appShell(){
- root.innerHTML=`<main class="app">
- <div class="topbar"><div class="brand"><div class="brandmark"><svg viewBox="0 0 48 48" fill="none"><path d="M8 35 18 25l8 7 14-19" stroke="#5ee6a4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="35" r="3" fill="#5ee6a4"/><circle cx="18" cy="25" r="3" fill="#5ee6a4"/><circle cx="26" cy="32" r="3" fill="#5ee6a4"/><circle cx="40" cy="13" r="3" fill="#5ee6a4"/></svg></div><div><h1>Booked Profit Tracker</h1><p>Realized returns, beautifully organized.</p></div></div><div class="status"><span class="dot"></span>Live sync</div><div class="top-actions"><button class="icon-btn" id="settingsBtn" title="Settings">⚙</button></div></div>
- <section class="hero"><div class="hero-row"><div><h2>Your realized performance</h2><p>Only completed buy → sell trades count. Every phone signed into this account sees the same cloud data.</p><div class="hero-profit"><small>Total booked profit</small><span id="profit">₹0</span></div></div></div></section>
- <div class="metrics"><div class="metric"><div class="k">Total cost</div><div class="v" id="cost">₹0</div></div><div class="metric"><div class="k">Total sale value</div><div class="v" id="sale">₹0</div></div><div class="metric"><div class="k">Realized XIRR</div><div class="v" id="xirr">—</div></div><div class="metric"><div class="k">Completed trades</div><div class="v" id="count">0</div></div></div>
- <section class="card section"><div class="section-head"><div><h3 class="section-title">Add a sold trade</h3><p class="section-sub">Enter the ticker to show its company logo automatically.</p></div></div>
- <div class="form-grid">
-  <div class="field company-wrap"><label>Share name / ticker</label><input id="stock" placeholder="TCS, RELIANCE, HBLENG" autocomplete="off"><div class="company-preview" id="preview">—</div></div>
-  <div class="field"><label>No. of shares</label><input id="qtyIn" type="number" min="0.0001" step="0.0001" placeholder="100"></div>
-  <div class="field"><label>Avg buy price ₹</label><input id="avgBuyIn" type="number" min="0.01" step=".01" placeholder="500"></div>
-  <div class="field"><label>Sell price ₹</label><input id="sellPriceIn" type="number" min="0" step=".01" placeholder="700"></div>
-  <div class="field"><label>Buy date</label><input id="buyDate" type="date"></div>
-  <div class="field"><label>Sell date</label><input id="sellDate" type="date"></div>
-  <div class="field"><label>Total buy value ₹</label><input id="costIn" type="number" readonly placeholder="Auto"></div>
-  <div class="field"><label>Total sell value ₹</label><input id="saleIn" type="number" readonly placeholder="Auto"></div>
-  <button class="primary" id="addBtn">+ Add trade</button>
- </div><div class="helper">Total buy value = shares × average buy price. Total sell value = shares × sell price. Each trade shows booked profit, return %, and trade CAGR. Overall realized XIRR uses the total buy and sell cash flows on their actual dates.</div></section>
- <section class="card section"><div class="section-head"><div><h3 class="section-title">Sold trades</h3><p class="section-sub">Newest sales first.</p></div><div><button class="secondary" id="exportBtn">Export</button></div></div><div class="trades" id="trades"></div></section>
- <div class="footer">Signed in as ${esc(auth.currentUser?.displayName||'account')} · Cloud synchronized</div>
- </main>`;
- const now=new Date().toISOString().slice(0,10);buyDate.value=now;sellDate.value=now;
- stock.addEventListener('input',()=>{const t=stock.value.trim().toUpperCase();preview.innerHTML=t?logoHtml({ticker:t,stock:t}):'—'});
- const recalc=()=>{const q=Number(qtyIn.value||0),a=Number(avgBuyIn.value||0),sp=Number(sellPriceIn.value||0);costIn.value=q&&a?(q*a).toFixed(2):'';saleIn.value=q&&sp?(q*sp).toFixed(2):''};
- [qtyIn,avgBuyIn,sellPriceIn].forEach(el=>el.addEventListener('input',recalc));
- addBtn.onclick=addTrade;exportBtn.onclick=exportData;settingsBtn.onclick=openSettings;render();
-}
-async function addTrade(){
- const ticker=stock.value.trim().toUpperCase().replace(/\s+/g,''),
-       b=buyDate.value,s=sellDate.value,
-       qty=Number(qtyIn.value),avgBuy=Number(avgBuyIn.value),sellPrice=Number(sellPriceIn.value),
-       c=qty*avgBuy,v=qty*sellPrice;
- if(!ticker||!b||!s||!(qty>0)||!(avgBuy>0)||sellPrice<0)return alert('Please complete all fields.');
- if(s<=b)return alert('Sell date must be after buy date.');
- try{
-   await addDoc(collection(db,'users',auth.currentUser.uid,'trades'),{
-     ticker,stock:ticker,quantity:qty,avgBuy,sellPrice,buyDate:b,sellDate:s,cost:c,sale:v,
-     logoUrl:logoUrl(ticker),createdAt:serverTimestamp()
-   });
-   stock.value='';qtyIn.value='';avgBuyIn.value='';sellPriceIn.value='';costIn.value='';saleIn.value='';preview.textContent='—'
- }catch(e){alert('Could not save trade. Check your internet connection.')}
-}
-function render(){
- const cost=trades.reduce((a,t)=>a+Number(t.cost||0),0),sale=trades.reduce((a,t)=>a+Number(t.sale||0),0),profit=sale-cost;
- const p=document.getElementById('profit');if(!p)return;
- document.getElementById('cost').textContent=money(cost);document.getElementById('sale').textContent=money(sale);p.textContent=money(profit);p.className=profit>=0?'pos':'neg';document.getElementById('count').textContent=trades.length;
- const flows=[];trades.forEach(t=>{flows.push({date:t.buyDate,amount:-Number(t.cost)});flows.push({date:t.sellDate,amount:Number(t.sale)})});const r=xirr(flows);const xr=document.getElementById('xirr');xr.textContent=r==null?'—':(r*100).toFixed(2)+'%';xr.className=r!=null&&r>=0?'pos':'neg';
- const box=document.getElementById('trades');if(!trades.length){box.innerHTML='<div class="empty"><div class="empty-icon">📊</div>No completed trades yet.<br>Add your first sold position above.</div>';return}
- box.innerHTML=trades.slice().sort((a,b)=>(b.sellDate||'').localeCompare(a.sellDate||'')).map(t=>{
-   const qty=Number(t.quantity||1),avg=Number(t.avgBuy||t.cost||0),sp=Number(t.sellPrice??(qty?Number(t.sale||0)/qty:0)),
-         cost=Number(t.cost??qty*avg),sale=Number(t.sale??qty*sp),pr=sale-cost,
-         ret=cost?pr/cost:0,cr=cagr(t);
-   return `<div class="trade">
-     <div class="logo">${logoHtml(t)}</div>
-     <div class="trade-main"><b>${esc(t.ticker||t.stock)}</b><span>${fmt(t.buyDate)} → ${fmt(t.sellDate)} · ${qty} shares</span></div>
-     <div class="trade-stat"><span class="k">Avg buy · Sell</span><span class="v">₹${avg.toFixed(2)} · ₹${sp.toFixed(2)}</span></div>
-     <div class="trade-stat"><span class="k">Buy value · Sell value</span><span class="v">${money(cost)} · ${money(sale)}</span></div>
-     <div class="trade-stat"><span class="k">Profit · Return · CAGR</span><span class="v ${pr>=0?'pos':'neg'}">${money(pr)} · ${(ret*100).toFixed(2)}% · ${cr==null?'—':(cr*100).toFixed(2)+'%'}</span></div>
-     <button class="delete" data-id="${t.id}">Delete</button>
-   </div>`
- }).join('');
- box.querySelectorAll('.delete').forEach(b=>b.onclick=async()=>{if(confirm('Delete this trade?'))await deleteDoc(doc(db,'users',auth.currentUser.uid,'trades',b.dataset.id))});
-}
-function exportData(){const blob=new Blob([JSON.stringify(trades,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='booked-profit-trades.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
-function openSettings(){
- const back=document.createElement('div');back.className='modal-backdrop open';back.innerHTML=`<div class="modal"><button class="close" id="close">×</button><h3>Account & app</h3><p>Use the same username and password on every phone to keep trades synchronized live. No Gmail is required. Logo lookup uses your Logo.dev publishable key configured for this app.</p><div class="modal-row"><button class="secondary" id="signout">Sign out</button><button class="secondary" id="clearLocal">Clear old local data</button></div></div>`;document.body.appendChild(back);back.querySelector('#close').onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()};back.querySelector('#signout').onclick=()=>signOut(auth);
- back.querySelector('#clearLocal').onclick=()=>{localStorage.removeItem('bookedProfitTracker.v2');alert('Old local-only data cleared from this phone.');};
-}
-
-function init(){
- if(!CONFIG.firebase?.apiKey||CONFIG.firebase.apiKey.includes('PASTE_')){
-  root.innerHTML=`<main class="auth"><div class="auth-card"><div class="auth-logo">⚙️</div><h2>One-time setup needed</h2><p>The final multi-phone version is ready, but Firebase cloud credentials have not been added yet.</p><div class="setup-banner">Open <b>app-config.js</b> and add your Firebase web config plus your Logo.dev publishable key. Then every phone can sign in to the same account and see live data.</div></div></main>`;return;
- }
- app=initializeApp(CONFIG.firebase);auth=getAuth(app);db=getFirestore(app);
- onAuthStateChanged(auth,user=>{if(!user){if(unsubscribe){unsubscribe();unsubscribe=null}authScreen('login');return}appShell();const q=query(collection(db,'users',user.uid,'trades'),orderBy('sellDate','desc'));unsubscribe=onSnapshot(q,s=>{trades=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed. Check Firebase security rules.'))});
-}
-init();
-</script>
-</body>
-</html>
+const fmt=d=>d?new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const initials=s=>String(s||'?').replace(/[^A-Z0-9]/gi,'').slice(0,2).toUpperCase()||'?';
+const logoUrl=t=>t?`https://dharunashokkumar.github.io/indian-listed-company-logos/nse/NSE_${encodeURIComponent(String(t).toUpperCase())}.svg`:'';
+function logoHtml(t){const u=t.logoUrl||logoUrl(t.ticker||t.stock);return u?`<img src="${esc(u)}" onerror="this.style.display='none';this.parentElement.textContent='${esc(initials(t.ticker||t.stock))}'">`:esc(initials(t.ticker||t.stock))}
+function days(a,b){return Math.max(0,(new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000)}
+function overallCagr(ts){if(!ts.length)return null;const first=ts.reduce((a,b)=>(b.buyDate<a.buyDate?b:a));const last=ts.reduce((a,b)=>(b.sellDate>a.sellDate?b:a));const cost=ts.reduce((s,t)=>s+Number(t.cost||0),0),sale=ts.reduce((s,t)=>s+Number(t.sale||0),0),y=days(first.buyDate,last.sellDate)/365.25;if(cost<=0||sale<=0||y<=0)return null;return Math.pow(sale/cost,1/y)-1}
+function authId(u){return String(u||'').trim().toLowerCase()+'@bookedprofittracker.app'}
+function validUsername(u){return /^[a-zA-Z0-9_]{3,24}$/.test(u)}
+function authScreen(mode='login',msg=''){root.innerHTML=`<main class="auth"><div class="auth-card"><div class="auth-mark"><svg viewBox="0 0 48 48" width="34" fill="none"><path d="M7 35 17 25l8 7 15-19" stroke="#42df9b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2>${mode==='login'?'Welcome back':'Create your account'}</h2><p>Use the same username and password on your phone and your father's phone. Your sold trades and profit update live in the cloud. No Gmail required.</p><div class="field"><label>Username</label><input id="user" maxlength="24" placeholder="e.g. mohit_01"></div><div class="field"><label>Password</label><input id="pass" type="password" placeholder="6+ characters"></div><div class="error">${esc(msg)}</div><div class="auth-actions"><button class="primary" id="go">${mode==='login'?'Sign in':'Create account'}</button><button class="secondary" id="switchBtn">${mode==='login'?'Create a new account':'I already have an account'}</button></div><div class="foot">Private cloud data · Live sync</div></div></main>`;go.onclick=async()=>{const u=user.value.trim(),p=pass.value;if(!validUsername(u))return authScreen(mode,'Username: 3–24 letters, numbers or underscore.');if(p.length<6)return authScreen(mode,'Password must be at least 6 characters.');try{const e=authId(u);if(mode==='login')await signInWithEmailAndPassword(auth,e,p);else{const c=await createUserWithEmailAndPassword(auth,e,p);await updateProfile(c.user,{displayName:u})}}catch(e){authScreen(mode,pretty(e))}};switchBtn.onclick=()=>authScreen(mode==='login'?'signup':'login')}
+function pretty(e){const c=e?.code||'';return c.includes('invalid-credential')?'Username or password is incorrect.':c.includes('email-already-in-use')?'That username is already taken.':c.includes('weak-password')?'Use a stronger password (6+ characters).':e?.message||'Something went wrong.'}
+function appShell(){root.innerHTML=`<main class="app"><header class="top"><div class="brand"><div class="mark"><svg viewBox="0 0 48 48" fill="none"><path d="M7 35 17 25l8 7 15-19" stroke="#42df9b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h1>Booked Profit Tracker</h1><p>Realized money. Clearly organized.</p></div></div><div class="right"><div class="sync"><span class="dot"></span>Live sync</div><button class="icon" id="settings">⚙</button></div></header>
+<section class="hero"><div class="hero-top"><div><div class="eyebrow" id="periodLabel">All years · Net realized profit</div><div id="profit" class="profit pos">₹0</div><div class="hero-sub">Gross profit after manually entered charges</div></div><select id="year" class="year"></select></div></section>
+<div class="kpis"><div class="kpi"><div class="label">Invested</div><div class="value" id="cost">₹0</div><div class="hint">Total buy value</div></div><div class="kpi"><div class="label">Sold for</div><div class="value" id="sale">₹0</div><div class="hint">Total sell value</div></div><div class="kpi"><div class="label">Return</div><div class="value pos" id="ret">—</div><div class="hint">Profit ÷ invested</div></div><div class="kpi"><div class="label">Overall CAGR</div><div class="value pos" id="cagr">—</div><div class="hint">Selected period</div></div></div>
+<div class="actions"><button class="primary" id="addTradeOpen">＋ Add sold trade</button><button class="secondary" id="addChargeOpen">＋ Add charge</button><button class="secondary" id="exportBtn">Export</button></div>
+<section class="card section"><div class="section-head"><div><h3 class="title">Charges</h3><p class="sub">Enter brokerage, taxes or other costs manually.</p></div><div id="chargeTotal" class="title">₹0</div></div><div class="charges-line"><span>Charges reduce your net realized profit.</span><b id="tradeCount">0 trades</b></div></section>
+<section class="card section"><div class="section-head"><div><h3 class="title">Sold shares</h3><p class="sub">Each company shows the exact profit and % booked.</p></div></div><div class="trades" id="trades"></div></section>
+<div class="foot">Signed in as ${esc(auth.currentUser?.displayName||'account')} · Cloud synchronized</div></main>`;
+year.onchange=()=>{selectedYear=year.value;render()};addTradeOpen.onclick=tradeModal;addChargeOpen.onclick=chargeModal;exportBtn.onclick=exportData;settings.onclick=settingsModal;render()}
+function yearOptions(){const ys=new Set();trades.forEach(t=>{if(t.sellDate)ys.add(t.sellDate.slice(0,4))});charges.forEach(c=>{if(c.date)ys.add(c.date.slice(0,4))});return ['all',...Array.from(ys).sort().reverse()]}
+function filteredTrades(){return trades.filter(t=>selectedYear==='all'||String(t.sellDate||'').slice(0,4)===selectedYear)}
+function filteredCharges(){return charges.filter(c=>selectedYear==='all'||String(c.date||'').slice(0,4)===selectedYear)}
+function render(){if(!document.getElementById('year'))return;const opts=yearOptions();if(!opts.includes(selectedYear))selectedYear=opts[0];year.innerHTML=opts.map(y=>`<option value="${y}">${y==='all'?'All years':y}</option>`).join('');year.value=selectedYear;const ts=filteredTrades(),cs=filteredCharges();const cost=ts.reduce((s,t)=>s+Number(t.cost||0),0),sale=ts.reduce((s,t)=>s+Number(t.sale||0),0),gross=sale-cost,charge=cs.reduce((s,c)=>s+Number(c.amount||0),0),net=gross-charge,ret=cost?gross/cost:null,cr=overallCagr(ts);profit.textContent=money(net);profit.className='profit '+(net>=0?'pos':'neg');document.getElementById('periodLabel').textContent=`${selectedYear==='all'?'All years':selectedYear} · Net realized profit`;document.getElementById('cost').textContent=money(cost);document.getElementById('sale').textContent=money(sale);document.getElementById('ret').textContent=ret==null?'—':(ret*100).toFixed(2)+'%';document.getElementById('ret').className='value '+(ret!=null&&ret>=0?'pos':'neg');document.getElementById('cagr').textContent=cr==null?'—':(cr*100).toFixed(2)+'%';document.getElementById('cagr').className='value '+(cr!=null&&cr>=0?'pos':'neg');document.getElementById('chargeTotal').textContent=money(charge);document.getElementById('tradeCount').textContent=ts.length+(ts.length===1?' trade':' trades');const box=document.getElementById('trades');if(!ts.length){box.innerHTML='<div class="empty"><strong>No sold shares for this period</strong>Add a completed buy → sell trade to see it here.</div>';return}box.innerHTML=ts.slice().sort((a,b)=>(b.sellDate||'').localeCompare(a.sellDate||'')).map(t=>{const qty=Number(t.quantity||1),avg=Number(t.avgBuy||0),sp=Number(t.sellPrice??(qty?Number(t.sale||0)/qty:0)),c=Number(t.cost??qty*avg),s=Number(t.sale??qty*sp),p=s-c,r=c?p/c:0;return `<div class="trade"><div class="logo">${logoHtml(t)}</div><div class="trade-main"><b>${esc(t.ticker||t.stock)}</b><span>${fmt(t.buyDate)} → ${fmt(t.sellDate)} · ${qty} shares</span></div><div class="stat"><span class="k">Buy → Sell</span><span class="v">${money(avg)} → ${money(sp)}</span></div><div class="stat"><span class="k">Value</span><span class="v">${money(c)} → ${money(s)}</span></div><div class="trade-result"><div class="profit ${p>=0?'pos':'neg'}">${p>=0?'+':''}${money(p)}</div><div class="return ${r>=0?'pos':'neg'}">${r>=0?'+':''}${(r*100).toFixed(2)}% booked</div></div><button class="delete" data-id="${t.id}" title="Delete">×</button></div>`}).join('');box.querySelectorAll('.trade-main,.stat,.trade-result,.logo').forEach(el=>el.parentElement.onclick=e=>{if(!e.target.classList.contains('delete')){const t=ts.find(x=>x.id===el.parentElement.querySelector('.delete').dataset.id);if(t)detailModal(t)}});box.querySelectorAll('.delete').forEach(b=>b.onclick=async e=>{e.stopPropagation();if(confirm('Delete this trade?'))await deleteDoc(doc(db,'users',auth.currentUser.uid,'trades',b.dataset.id))})}
+function tradeModal(){const back=document.createElement('div');back.className='modal-back open';back.innerHTML=`<div class="modal"><button class="close" id="x">×</button><h3>Add sold trade</h3><p>Enter the completed buy → sell details. Buy and sell values are calculated automatically.</p><div class="modal-grid"><div class="field full"><label>Company / ticker</label><input id="mTicker" placeholder="TCS, RELIANCE, HBLENG"></div><div class="field"><label>No. of shares</label><input id="mQty" type="number" min="0.0001" step="0.0001" placeholder="100"></div><div class="field"><label>Average buy price ₹</label><input id="mBuy" type="number" min="0.01" step=".01" placeholder="500"></div><div class="field"><label>Sell price ₹</label><input id="mSell" type="number" min="0" step=".01" placeholder="700"></div><div class="field"><label>Buy date</label><input id="mBD" type="date"></div><div class="field"><label>Sell date</label><input id="mSD" type="date"></div><div class="field"><label>Total buy value</label><div class="auto" id="mCost">Auto</div></div><div class="field"><label>Total sell value</label><div class="auto" id="mSale">Auto</div></div></div><div class="modal-actions"><button class="secondary" id="cancel">Cancel</button><button class="primary" id="save">Save trade</button></div></div>`;document.body.appendChild(back);mBD.value=mSD.value=new Date().toISOString().slice(0,10);const calc=()=>{const q=Number(mQty.value||0),b=Number(mBuy.value||0),s=Number(mSell.value||0);mCost.textContent=q&&b?money(q*b):'Auto';mSale.textContent=q&&s?money(q*s):'Auto'};[mQty,mBuy,mSell].forEach(x=>x.oninput=calc);x.onclick=cancel.onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()};save.onclick=async()=>{const ticker=mTicker.value.trim().toUpperCase().replace(/\s+/g,''),q=Number(mQty.value),b=Number(mBuy.value),s=Number(mSell.value),bd=mBD.value,sd=mSD.value;if(!ticker||!(q>0)||!(b>0)||!(s>=0)||!bd||!sd)return alert('Please complete all fields.');if(sd<=bd)return alert('Sell date must be after buy date.');try{await addDoc(collection(db,'users',auth.currentUser.uid,'trades'),{ticker,stock:ticker,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:logoUrl(ticker),createdAt:serverTimestamp()});back.remove()}catch(e){alert('Could not save trade.')}}}
+function chargeModal(){const back=document.createElement('div');back.className='modal-back open';back.innerHTML=`<div class="modal"><button class="close" id="x">×</button><h3>Add charge</h3><p>Manually enter brokerage, taxes, GST, exchange charges or any other cost. It will reduce net profit for that date/year.</p><div class="modal-grid"><div class="field"><label>Charge amount ₹</label><input id="ca" type="number" min="0" step=".01" placeholder="2439.90"></div><div class="field"><label>Date</label><input id="cd" type="date"></div><div class="field full"><label>Note (optional)</label><input id="cn" maxlength="80" placeholder="Brokerage + taxes"></div></div><div class="modal-actions"><button class="secondary" id="cancel">Cancel</button><button class="primary" id="save">Save charge</button></div></div>`;document.body.appendChild(back);cd.value=new Date().toISOString().slice(0,10);x.onclick=cancel.onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()};save.onclick=async()=>{const amount=Number(ca.value),date=cd.value,note=cn.value.trim();if(!(amount>=0)||!date)return alert('Enter amount and date.');try{await addDoc(collection(db,'users',auth.currentUser.uid,'charges'),{amount,date,note,createdAt:serverTimestamp()});back.remove()}catch(e){alert('Could not save charge.')}}}
+function detailModal(t){const qty=Number(t.quantity||1),avg=Number(t.avgBuy||0),sp=Number(t.sellPrice??(qty?Number(t.sale||0)/qty:0)),c=Number(t.cost??qty*avg),s=Number(t.sale??qty*sp),p=s-c,r=c?p/c:0;const back=document.createElement('div');back.className='modal-back open';back.innerHTML=`<div class="modal"><button class="close" id="x">×</button><div class="detail-head"><div class="detail-logo">${logoHtml(t)}</div><div class="detail-name"><b>${esc(t.ticker||t.stock)}</b><span>${qty} shares · ${fmt(t.buyDate)} → ${fmt(t.sellDate)}</span></div></div><div class="detail-grid"><div class="detail-item"><span>Average buy</span><b>${money(avg)}</b></div><div class="detail-item"><span>Sell price</span><b>${money(sp)}</b></div><div class="detail-item"><span>Total buy value</span><b>${money(c)}</b></div><div class="detail-item"><span>Total sell value</span><b>${money(s)}</b></div><div class="detail-item"><span>Booked profit</span><b class="${p>=0?'pos':'neg'}">${p>=0?'+':''}${money(p)}</b></div><div class="detail-item"><span>Return booked</span><b class="${r>=0?'pos':'neg'}">${r>=0?'+':''}${(r*100).toFixed(2)}%</b></div></div><div class="modal-actions"><button class="secondary" id="cancel">Close</button></div></div>`;document.body.appendChild(back);x.onclick=cancel.onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()}}
+function settingsModal(){const back=document.createElement('div');back.className='modal-back open';back.innerHTML=`<div class="modal"><button class="close" id="x">×</button><h3>Account</h3><p>Use this same username and password on your father's phone. Firestore keeps the trades and charges synchronized live across devices. No Gmail is required.</p><div class="modal-actions"><button class="secondary" id="signout">Sign out</button></div></div>`;document.body.appendChild(back);x.onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()};signout.onclick=()=>signOut(auth)}
+function exportData(){const data={exportedAt:new Date().toISOString(),trades,charges};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='booked-profit-tracker-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function init(){if(!CONFIG.firebase?.apiKey||CONFIG.firebase.apiKey.includes('PASTE_')){root.innerHTML='<main class="auth"><div class="auth-card"><h2>One-time setup needed</h2><p>Add the Firebase web configuration to app-config.js.</p></div></main>';return}app=initializeApp(CONFIG.firebase);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,user=>{if(!user){if(unsubTrades)unsubTrades();if(unsubCharges)unsubCharges();authScreen('login');return}appShell();const base=['users',user.uid];unsubTrades=onSnapshot(query(collection(db,...base,'trades'),orderBy('sellDate','desc')),s=>{trades=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for trades. Check Firestore rules.'));unsubCharges=onSnapshot(query(collection(db,...base,'charges'),orderBy('date','desc')),s=>{charges=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for charges. Check Firestore rules.'))})}init();
+</script></body></html>
