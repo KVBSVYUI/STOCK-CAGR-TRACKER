@@ -3,8 +3,22 @@
   "short_name": "Profit Tracker",
   "start_url": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#09111f",
   "theme_color": "#0b1220",
   "description": "Track booked stock profits, trade CAGR and overall realized XIRR.",
-  "icons": []
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
