@@ -1,0 +1,16 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Refreshing Booked Profit Tracker…</title></head><body style="margin:0;background:#070b12;color:#f4f7fb;font-family:system-ui;display:grid;place-items:center;min-height:100vh"><div>Refreshing app…</div><script>
+(async()=>{
+  try{
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    if(window.caches){
+      const keys=await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+  }catch(e){}
+  location.replace('./?fresh='+Date.now());
+})();
+</script></body></html>
