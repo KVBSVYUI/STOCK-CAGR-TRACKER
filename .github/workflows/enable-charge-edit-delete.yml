@@ -1,0 +1,46 @@
+name: Enable charge edit delete
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-charge-edit-delete.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index.html
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace('getFirestore,collection,addDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp', 'getFirestore,collection,addDoc,deleteDoc,updateDoc,doc,onSnapshot,query,orderBy,serverTimestamp')
+          if '.charge-list' not in s:
+              s=s.replace('.charges-line b{font-size:13px;color:var(--text)}', '.charges-line b{font-size:13px;color:var(--text)}.charge-list{padding:0 12px 12px}.charge-row{display:grid;grid-template-columns:1fr 130px 190px 70px;gap:12px;align-items:center;padding:12px 7px;border-top:1px solid var(--line)}.charge-info b{font-size:12px}.charge-info span{display:block;color:var(--muted);font-size:9px;margin-top:3px}.charge-amount{text-align:right;font-weight:850;font-size:12px}.charge-actions{display:flex;justify-content:flex-end;gap:4px}.mini-btn{border:1px solid var(--line);background:#0e1724;color:var(--text);border-radius:9px;padding:6px 8px;font-size:9px;font-weight:800}.mini-btn.delete-charge:hover{color:var(--red);border-color:#59303a}')
+              s=s.replace('@media(max-width:560px){', '@media(max-width:560px){.charge-row{grid-template-columns:1fr auto;gap:6px}.charge-amount{text-align:left}.charge-actions{justify-content:flex-start}')
+          charge_pat=r'<section class="card section"><div class="section-head"><div><h3 class="title">Charges</h3>.*?</section>'
+          charge_new='''<section class="card section"><div class="section-head"><div><h3 class="title">Charges</h3><p class="sub">Enter brokerage, taxes or other costs manually. You can edit or delete any charge.</p></div><div id="chargeTotal" class="title">₹0</div></div><div class="charges-line"><span>Charges reduce your net realized profit.</span><b id="tradeCount">0 trades</b></div><div class="charge-list" id="chargeList"></div></section>'''
+          s,n=re.subn(charge_pat,charge_new,s,count=1,flags=re.S)
+          render_anchor="const box=document.getElementById('trades')"
+          if 'data-edit-charge' not in s and render_anchor in s:
+              block="""const chargeBox=document.getElementById('chargeList');if(chargeBox){chargeBox.innerHTML=cs.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(c=>`<div class=\"charge-row\"><div class=\"charge-info\"><b>${esc(c.note||'Charge')}</b><span>${fmt(c.date)}</span></div><div></div><div class=\"charge-amount\">−${money(c.amount)}</div><div class=\"charge-actions\"><button class=\"mini-btn\" data-edit-charge=\"${c.id}\">Edit</button><button class=\"mini-btn delete-charge\" data-delete-charge=\"${c.id}\">×</button></div></div>`).join('');chargeBox.querySelectorAll('[data-edit-charge]').forEach(b=>b.onclick=e=>{e.stopPropagation();const c=charges.find(x=>x.id===b.dataset.editCharge);if(c)chargeModal(c)});chargeBox.querySelectorAll('[data-delete-charge]').forEach(b=>b.onclick=async e=>{e.stopPropagation();const c=charges.find(x=>x.id===b.dataset.deleteCharge);if(c&&confirm(`Delete this charge of ${money(c.amount)}?`))try{await deleteDoc(doc(db,'users',auth.currentUser.uid,'charges',c.id))}catch(err){alert('Could not delete charge: '+(err.code||'error')+' - '+(err.message||''))}})}"""
+              s=s.replace(render_anchor,block+render_anchor,1)
+          if 'function chargeModal(existing=null)' not in s:
+              old_pat=r'function chargeModal\(\)\{.*?\}\nfunction detailModal'
+              new_fn='''function chargeModal(existing=null){const back=document.createElement('div');back.className='modal-back open';const editing=!!existing;back.innerHTML=`<div class="modal"><button class="close" id="x">×</button><h3>${editing?'Edit charge':'Add charge'}</h3><p>Manually enter brokerage, taxes, GST, exchange charges or any other cost. It will reduce net profit for that date/year.</p><div class="modal-grid"><div class="field"><label>Charge amount ₹</label><input id="ca" type="number" min="0" step=".01" placeholder="2439.90"></div><div class="field"><label>Date</label><input id="cd" type="date"></div><div class="field full"><label>Note (optional)</label><input id="cn" maxlength="80" placeholder="Brokerage + taxes"></div></div><div class="modal-actions"><button class="secondary" id="cancel">Cancel</button><button class="primary" id="save">${editing?'Update charge':'Save charge'}</button></div></div>`;document.body.appendChild(back);ca.value=existing?Number(existing.amount||0):'';cd.value=existing?.date||new Date().toISOString().slice(0,10);cn.value=existing?.note||'';x.onclick=cancel.onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()};save.onclick=async()=>{const amount=Number(ca.value),date=cd.value,note=cn.value.trim();if(!(amount>=0)||!date)return alert('Enter amount and date.');try{if(editing){const ref=doc(db,'users',auth.currentUser.uid,'charges',existing.id);await updateDoc(ref,{amount,date,note})}else{await addDoc(collection(db,'users',auth.currentUser.uid,'charges'),{amount,date,note,createdAt:serverTimestamp()})}back.remove()}catch(e){alert((editing?'Could not update charge: ':'Could not save charge: ')+(e.code||'error')+' - '+(e.message||''))}}}
+function detailModal'''
+              s,n2=re.subn(old_pat,new_fn,s,count=1,flags=re.S)
+          p.write_text(s)
+          if 'data-edit-charge' not in s or 'updateDoc(ref' not in s:
+              raise SystemExit('Patch verification failed')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Add charge edit and delete controls'
+          git push
