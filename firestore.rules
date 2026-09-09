@@ -2,13 +2,13 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can access only their own trades and charges.
-    // Admins can access these paths through the authenticated admin claim.
+    // Users can access only their own application data.
+    // Admins are authorized by the Firebase Auth custom claim.
     match /users/{userId}/{collectionName}/{documentId} {
       allow read, write: if request.auth != null
                          && (request.auth.uid == userId
                              || request.auth.token.admin == true)
-                         && collectionName in ['trades', 'charges'];
+                         && collectionName in ['trades', 'charges', 'usage'];
     }
 
     // Announcements are visible to signed-in users. Only admins may write them.
