@@ -1,5 +1,7 @@
-const CACHE='booked-profit-tracker-final-v17';
+const CACHE='booked-profit-tracker-final-v18';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./app-config.js','./admin.js'];
+const ADMIN_FIX="async function setupMenu(){if(booted)return;booted=true;try{const st=await ensureProfile();if(!st?.user)return;";
+const ADMIN_FIXED="async function setupMenu(){if(booted)return;try{const [a,am]=await Promise.all([import(APP),import(AUTH)]);const app=a.getApps()[0],auth=am.getAuth(app);const u=await new Promise(resolve=>{const off=am.onAuthStateChanged(auth,user=>{off();resolve(user)})});if(!u)return;booted=true;const st=await ensureProfile();if(!st?.user)return;";
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(x=>x.put(e.request,copy));return r}).catch(()=>caches.match('./'))) });
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(async r=>{if(new URL(e.request.url).pathname.endsWith('/admin.js')){const text=await r.clone().text();const fixed=text.replace(ADMIN_FIX,ADMIN_FIXED);r=new Response(fixed,{status:r.status,statusText:r.statusText,headers:r.headers})}const copy=r.clone();caches.open(CACHE).then(x=>x.put(e.request,copy));return r}).catch(()=>caches.match('./'))) });
