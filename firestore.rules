@@ -2,25 +2,77 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can access only their own application data.
-    // Admins are authorized by the Firebase Auth custom claim.
-    match /users/{userId}/{collectionName}/{documentId} {
-      allow read, write: if request.auth != null
-                         && (request.auth.uid == userId
-                             || request.auth.token.admin == true)
-                         && collectionName in ['trades', 'charges', 'usage'];
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // Announcements are visible to signed-in users. Only admins may write them.
-    match /announcements/{announcementId} {
-      allow read: if request.auth != null;
-      allow create, update, delete: if request.auth != null
-                                    && request.auth.token.admin == true;
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.admin == true;
     }
 
-    // Each user's mailbox read-state is private to that user.
+    function activeOwner(uid) {
+      return signedIn() && request.auth.uid == uid
+        && (!exists(/databases/$(database)/documents/users/$(uid))
+            || get(/databases/$(database)/documents/users/$(uid)).data.disabled != true);
+    }
+
+    // Admin roles are deliberately not writable by the web app.
+    // The owner enables the first admin manually in Firebase Console by creating:
+    // /admins/<ADMIN_UID>  { admin: true }
+    match /admins/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if false;
+    }
+
+    // User profiles are visible only to the owner or an administrator.
+    // Normal users cannot set or change the protected disabled flag.
+    match /users/{userId} {
+      allow get: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if activeOwner(userId)
+                    && request.resource.data.keys().hasOnly(['email','username','displayName','createdAt','lastSeen']);
+      allow update: if isAdmin()
+                    || (activeOwner(userId)
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                           .hasOnly(['email','username','displayName','lastSeen']));
+      allow delete: if isAdmin();
+    }
+
+    // Each user's trades remain private. Admins can read/manage them.
+    match /users/{userId}/trades/{tradeId} {
+      allow read, write: if activeOwner(userId) || isAdmin();
+    }
+    match /{path=**}/trades/{tradeId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Charges remain private to the owner or an administrator.
+    match /users/{userId}/charges/{documentId} {
+      allow read, write: if activeOwner(userId) || isAdmin();
+    }
+    match /{path=**}/charges/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Usage / installation records are private to the owner or an administrator.
+    match /users/{userId}/usage/{documentId} {
+      allow read, write: if activeOwner(userId) || isAdmin();
+    }
+    match /{path=**}/usage/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Mailbox read-state is private to each user.
     match /users/{userId}/mailboxState/{messageId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if activeOwner(userId) || isAdmin();
+    }
+
+    // Announcements are visible to signed-in users; only admins can publish/change them.
+    match /announcements/{announcementId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
     }
   }
 }
