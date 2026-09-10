@@ -106,7 +106,8 @@ import('./admin.js').catch(()=>{});
     const top=document.querySelector('.top'),brand=document.querySelector('.brand'),right=document.querySelector('.right');
     if(top&&brand&&right){
       let m=document.getElementById('bptMenuButton');
-      if(!m){m=document.createElement('button');m.id='bptMenuButton';m.type='button';m.className='icon';m.textContent='☰';m.title='Menu';m.setAttribute('aria-label','Open menu');m.style.cssText='font-size:21px;font-weight:800;display:grid;place-items:center;flex:none';top.insertBefore(m,brand);m.onclick=menu}
+      if(!m){m=document.createElement('button');m.id='bptMenuButton';m.type='button';m.className='icon';m.textContent='☰';m.title='Menu';m.setAttribute('aria-label','Open menu');m.style.cssText='font-size:21px;font-weight:800;display:grid;place-items:center;flex:none';top.insertBefore(m,brand)}
+      if(!m.onclick)m.onclick=menu;
       let a=document.getElementById('bptAccountButton');
       if(!a){a=document.createElement('button');a.id='bptAccountButton';a.type='button';a.className='icon';a.textContent='👤';a.title='Account';a.setAttribute('aria-label','Account');right.insertBefore(a,right.firstChild);a.onclick=account}
       const s=document.getElementById('settings');if(s)s.onclick=account;
