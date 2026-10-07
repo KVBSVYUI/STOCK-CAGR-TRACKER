@@ -1,7 +1,7 @@
 {
   "name": "Booked Profit Tracker",
   "short_name": "Profit Tracker",
-  "start_url": "./",
+  "start_url": "./?app=v28",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
