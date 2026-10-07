@@ -25,9 +25,7 @@
       const app=apps[0],auth=am.getAuth(app),user=auth.currentUser;
       if(!user)throw new Error('Please sign in again.');
       current={a,am,fs,app,auth,user};
-      isAdmin=
-        String(user.email||'').toLowerCase()===OWNER_EMAIL ||
-        String(user.displayName||'').toLowerCase()===OWNER_USERNAME;
+      isAdmin=String(user.email||'').toLowerCase()===OWNER_EMAIL||String(user.displayName||'').toLowerCase()===OWNER_USERNAME;
       window.__bptAdminUid=user.uid;
       window.__bptIsAdmin=isAdmin;
     }catch(e){
@@ -36,24 +34,14 @@
     }
   }
 
-  const b=modal('<button class="close" data-close type="button">×</button><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><h3 style="margin:0">🛡️ Admin Dashboard</h3><p style="color:#8997aa;font-size:12px;margin:5px 0">Users, performance and app administration · Spark compatible</p></div><button id="bptAnnounce" class="primary" type="button">📢 Announcement</button></div><div id="bptAdminBody" style="margin-top:18px;color:#8997aa">Loading admin data…</div>');
+  const b=modal('<style>.bpt-admin-head{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:4px 2px 16px}.bpt-admin-title{display:flex;align-items:center;gap:11px}.bpt-admin-shield{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#172b42,#102033);border:1px solid #2c425d;font-size:22px}.bpt-admin-title h3{margin:0;font-size:19px;letter-spacing:-.02em}.bpt-admin-title p{margin:4px 0 0;color:#718096;font-size:11px}.bpt-admin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0 16px}.bpt-admin-stat{padding:13px 12px;border:1px solid #203047;border-radius:16px;background:linear-gradient(145deg,#101b29,#0b1420)}.bpt-admin-stat small{display:block;color:#718096;font-size:9px;text-transform:uppercase;letter-spacing:.07em}.bpt-admin-stat b{display:block;margin-top:5px;font-size:19px;line-height:1.1;color:#eef5ff}.bpt-admin-stat:nth-child(2) b{color:#55d6a0}.bpt-admin-stat:nth-child(3) b{color:#8fc7ff}.bpt-admin-stat:nth-child(4) b{color:#d7b8ff}.bpt-admin-meta{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;padding:10px 12px;border-radius:13px;background:#0b1522;border:1px solid #1d2c40;color:#718096;font-size:10px}.bpt-admin-meta strong{color:#55d6a0}.bpt-admin-search{width:100%;box-sizing:border-box;margin:0 0 12px;padding:12px 14px!important;border-radius:13px!important;background:#0b1522!important;border:1px solid #25364c!important;color:#eef5ff!important;outline:none}.bpt-user-list{display:grid;gap:9px}.bpt-user-card{padding:13px;border:1px solid #203047;border-radius:17px;background:linear-gradient(145deg,#101b29,#0b1420);transition:.15s}.bpt-user-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.bpt-user-id{display:flex;align-items:center;gap:10px;min-width:0}.bpt-avatar{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#203954,#14263a);border:1px solid #2d4965;color:#bfe0ff;font-weight:800;font-size:13px;flex:none}.bpt-user-name{min-width:0}.bpt-user-name b{display:block;color:#eef5ff;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpt-user-name small{display:block;margin-top:3px;color:#718096;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpt-user-profit{text-align:right;flex:none}.bpt-user-profit small{display:block;color:#718096;font-size:8px;text-transform:uppercase;letter-spacing:.06em}.bpt-user-profit b{display:block;margin-top:3px;font-size:15px;color:#55d6a0}.bpt-user-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:11px;padding-top:10px;border-top:1px solid #1a293b}.bpt-user-metrics{display:flex;gap:13px;color:#7f91a6;font-size:9px}.bpt-user-metrics b{color:#cbd6e3;font-size:10px}.bpt-user-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.bpt-user-actions button{font-size:9px!important;padding:6px 9px!important;border-radius:9px!important}.bpt-empty{padding:28px 12px;text-align:center;color:#718096;border:1px dashed #26384e;border-radius:15px}.bpt-owner-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:#0c2b22;color:#55d6a0;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}.bpt-disabled-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#3a2024;color:#ff9b9b;font-size:8px;font-weight:800}@media(max-width:600px){.bpt-admin-head{align-items:flex-start}.bpt-admin-grid{grid-template-columns:repeat(2,1fr)}.bpt-admin-stat b{font-size:17px}.bpt-admin-meta{align-items:flex-start;flex-direction:column}.bpt-user-top{align-items:flex-start}.bpt-user-profit b{font-size:14px}.bpt-user-bottom{align-items:flex-end}.bpt-user-metrics{gap:9px}.bpt-user-actions{max-width:170px}.bpt-admin-title h3{font-size:18px}}</style><button class="close" data-close type="button">×</button><div class="bpt-admin-head"><div class="bpt-admin-title"><div class="bpt-admin-shield">🛡️</div><div><h3>Admin Dashboard</h3><p>Users, performance & app administration</p></div></div><button id="bptAnnounce" class="primary" type="button">📢 Announcement</button></div><div id="bptAdminBody" style="color:#8997aa">Loading admin data…</div>');
   b.querySelector('#bptAnnounce').onclick=sendAnnouncement;
 
   try{
     const {fs,app}=current;
     const db=fs.getFirestore(app);
-
-    // Read the top-level users collection first. Then read each user's
-    // subcollections directly. This avoids collection-group query permission
-    // issues and works with the published owner/admin rules.
     const ps=await fs.getDocs(fs.collection(db,'users'));
-    const users=ps.docs.map(d=>({
-      uid:d.id,
-      ...d.data(),
-      tradeCount:0,
-      profit:0,
-      installations:0
-    }));
+    const users=ps.docs.map(d=>({uid:d.id,...d.data(),tradeCount:0,profit:0,installations:0}));
 
     await Promise.all(users.map(async u=>{
       const [ts,us]=await Promise.all([
@@ -71,23 +59,24 @@
     }));
 
     const now=Date.now();
-    const active30=users.filter(u=>{
-      const v=u.lastSeen?.toMillis?u.lastSeen.toMillis():0;
-      return v&&now-v<30*86400000;
-    }).length;
-    const new7=users.filter(u=>{
-      const v=u.createdAt?.toMillis?u.createdAt.toMillis():0;
-      return v&&now-v<7*86400000;
-    }).length;
+    const active30=users.filter(u=>{const v=u.lastSeen?.toMillis?u.lastSeen.toMillis():0;return v&&now-v<30*86400000}).length;
+    const new7=users.filter(u=>{const v=u.createdAt?.toMillis?u.createdAt.toMillis():0;return v&&now-v<7*86400000}).length;
     const installations=users.reduce((n,u)=>n+u.installations,0);
+    const totalProfit=users.reduce((n,u)=>n+u.profit,0);
 
     const body=b.querySelector('#bptAdminBody');
-    body.innerHTML='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px"><div class="bpt-stat"><small>Registered users</small><b>'+users.length+'</b></div><div class="bpt-stat"><small>Active · 30d</small><b>'+active30+'</b></div><div class="bpt-stat"><small>New · 7d</small><b>'+new7+'</b></div><div class="bpt-stat"><small>Installations</small><b>'+installations+'</b></div></div><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 14px;color:#718096;font-size:10px"><span>Owner: <b style="color:#55d6a0">'+esc(OWNER_USERNAME)+'</b></span><span>Installations are first launches/devices, not exact APK download counts.</span></div><input id="bptUserSearch" placeholder="Search users…" style="width:100%;margin-bottom:12px"><div id="bptUserRows"></div>';
+    body.innerHTML='<div class="bpt-admin-grid"><div class="bpt-admin-stat"><small>Registered users</small><b>'+users.length+'</b></div><div class="bpt-admin-stat"><small>Active · 30d</small><b>'+active30+'</b></div><div class="bpt-admin-stat"><small>New · 7d</small><b>'+new7+'</b></div><div class="bpt-admin-stat"><small>Installations</small><b>'+installations+'</b></div></div><div class="bpt-admin-meta"><span>Owner · <strong>'+esc(OWNER_USERNAME)+'</strong> · Total booked profit '+money(totalProfit)+'</span><span>First launches/devices · not APK downloads</span></div><input id="bptUserSearch" class="bpt-admin-search" placeholder="🔎  Search username, email or UID…"><div id="bptUserRows" class="bpt-user-list"></div>';
 
     const render=()=>{
       const q=b.querySelector('#bptUserSearch').value.trim().toLowerCase();
       const arr=users.filter(u=>[u.username,u.email,u.uid].some(v=>String(v||'').toLowerCase().includes(q)));
-      b.querySelector('#bptUserRows').innerHTML=arr.map(u=>'<div style="display:grid;grid-template-columns:minmax(150px,1.5fr) 70px 110px 180px;gap:10px;align-items:center;padding:11px 0;border-top:1px solid #1e2b3d;font-size:11px"><div><b>'+esc(u.username||'User')+'</b><small style="display:block;color:#718096">'+esc(u.email||'')+'</small></div><div>'+u.tradeCount+'</div><div>'+money(u.profit)+'</div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="secondary bpt-mini" data-view="'+esc(u.uid)+'">View</button><button class="secondary bpt-mini" data-toggle="'+esc(u.uid)+'">'+(u.disabled?'Enable':'Disable')+'</button>'+(u.uid===current.user.uid?'':'<button class="danger bpt-mini" data-delete="'+esc(u.uid)+'">Delete data</button>')+'</div></div>').join('')||'<div style="padding:24px;text-align:center;color:#8997aa">No users found.</div>';
+      b.querySelector('#bptUserRows').innerHTML=arr.map(u=>{
+        const name=String(u.username||u.displayName||'User');
+        const initials=name.slice(0,2).toUpperCase();
+        const profitClass=u.profit>=0?'':'color:#ff8f8f!important';
+        const owner=String(u.email||'').toLowerCase()===OWNER_EMAIL||String(name).toLowerCase()===OWNER_USERNAME;
+        return '<div class="bpt-user-card"><div class="bpt-user-top"><div class="bpt-user-id"><div class="bpt-avatar">'+esc(initials)+'</div><div class="bpt-user-name"><b>'+esc(name)+'</b><small>'+esc(u.email||'')+'</small></div></div><div class="bpt-user-profit"><small>Booked profit</small><b style="'+profitClass+'">'+(u.profit>=0?'+':'')+money(u.profit)+'</b></div></div><div class="bpt-user-bottom"><div class="bpt-user-metrics"><span>Trades <b>'+u.tradeCount+'</b></span><span>Devices <b>'+u.installations+'</b></span>'+(owner?'<span class="bpt-owner-badge">Owner</span>':(u.disabled?'<span class="bpt-disabled-badge">Disabled</span>':''))+'</div><div class="bpt-user-actions"><button class="secondary bpt-mini" data-view="'+esc(u.uid)+'">View</button><button class="secondary bpt-mini" data-toggle="'+esc(u.uid)+'">'+(u.disabled?'Enable':'Disable')+'</button>'+(u.uid===current.user.uid?'':'<button class="danger bpt-mini" data-delete="'+esc(u.uid)+'">Delete</button>')+'</div></div></div>';
+      }).join('')||'<div class="bpt-empty">No users found.</div>';
 
       b.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>userDetails(x.dataset.view));
       b.querySelectorAll('[data-toggle]').forEach(x=>x.onclick=()=>toggleUser(x.dataset.toggle,!users.find(u=>u.uid===x.dataset.toggle)?.disabled));
@@ -97,7 +86,7 @@
     b.querySelector('#bptUserSearch').oninput=render;
     render();
   }catch(e){
-    b.querySelector('#bptAdminBody').innerHTML='<div style="color:#ff8d8d">Could not load admin data: '+esc(e.message||e)+'</div>';
+    b.querySelector('#bptAdminBody').innerHTML='<div style="color:#ff8d8d;padding:18px;border:1px solid #5b3036;border-radius:14px;background:#25151a">Could not load admin data: '+esc(e.message||e)+'</div>';
   }
 }
   window.BPT_ADMIN_DASHBOARD=adminDashboard;
