@@ -8,8 +8,13 @@ service cloud.firestore {
 
     function isAdmin() {
       return signedIn()
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.admin == true;
+        && (
+          request.auth.token.email == 'mohitx12@bookedprofittracker.app'
+          || (
+            exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.admin == true
+          )
+        );
     }
 
     function activeOwner(uid) {
