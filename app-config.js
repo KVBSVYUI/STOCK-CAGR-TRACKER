@@ -32,6 +32,7 @@ import('./admin.js').catch(()=>{});
     document.getElementById('bptMenuClose').onclick=()=>d.remove();
     document.getElementById('bptMenuAccount').onclick=account;
     document.getElementById('bptMenuMailbox').onclick=()=>alert('Mailbox will be connected after the click issue is fully fixed.');
+    const ad=document.getElementById('bptMenuAdmin');if(ad)ad.onclick=()=>window.BPT_ADMIN_DASHBOARD&&window.BPT_ADMIN_DASHBOARD();
     d.onclick=e=>{if(e.target===d)d.remove()};
   }
   function normalizeCatalog(data){
