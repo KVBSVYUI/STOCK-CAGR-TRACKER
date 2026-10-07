@@ -1,28 +1,5 @@
-  async function adminDashboard(){
-    // Recover the Firebase session if the menu is opened during the auth bootstrap race.
-    if(!current){
-      try{
-        const [a,am,fs]=await loadFirebase();
-        const apps=a.getApps();
-        if(!apps[0])throw new Error('Firebase app is not ready yet.');
-        const app=apps[0];
-        const auth=am.getAuth(app);
-        const user=auth.currentUser;
-        if(!user)throw new Error('Please sign in again.');
-        current={a,am,fs,app,auth,user};
-        const ownerByAuth=
-          String(user.email||'').toLowerCase()===OWNER_EMAIL ||
-          String(user.displayName||'').toLowerCase()===OWNER_USERNAME;
-        isAdmin=ownerByAuth;
-        window.__bptAdminUid=user.uid;
-        window.__bptIsAdmin=isAdmin;
-      }catch(e){
-        alert(e.message||'Admin session is still loading. Please open Admin again.');
-        return;
-      }
-    }
-
-    const b=modal(m/firebasejs/12.2.1/firebase-app.js';
+(function(){
+  const APP='https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
   const AUTH='https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
   const FS='https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
   const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]));
@@ -39,7 +16,90 @@
   const account=async()=>{const b=modal('<button class="close" data-close type="button">×</button><h3>Account</h3><p style="color:#8997aa">Manage your account and sign out securely.</p><div class="modal-actions"><button id="bptSignOut" class="secondary" type="button">Sign out</button></div>');b.querySelector('#bptSignOut').onclick=async()=>{try{const {am,auth}=current||{};if(auth)await am.signOut(auth)}catch(e){alert('Could not sign out. Please try again.')}}};
   const mailbox=async()=>{const b=modal('<button class="close" data-close type="button">×</button><h3>📬 Mailbox</h3><p style="color:#8997aa;font-size:12px">Announcements and important updates.</p><div id="bptMailboxList" style="display:grid;gap:10px;margin-top:16px">Loading…</div>');try{const {fs,app,user}=current,db=fs.getFirestore(app);const [as,rs]=await Promise.all([fs.getDocs(fs.query(fs.collection(db,'announcements'),fs.orderBy('createdAt','desc'),fs.limit(30))),fs.getDocs(fs.collection(db,'users',user.uid,'mailboxState'))]);const read=new Set(rs.docs.map(x=>x.id));const list=b.querySelector('#bptMailboxList');if(!as.size){list.innerHTML='<div style="padding:24px;text-align:center;color:#8997aa">No announcements yet.</div>';return}list.innerHTML=as.docs.map(d=>{const x=d.data()||{};return `<article style="padding:14px;border:1px solid #243247;border-radius:14px;background:#0e1927"><div style="display:flex;justify-content:space-between;gap:10px"><b>${esc(x.title||'Announcement')}</b>${read.has(d.id)?'':'<span style="font-size:10px;color:#55d6a0">● NEW</span>'}</div><div style="white-space:pre-wrap;margin-top:8px;line-height:1.55;color:#c8d1dd;font-size:13px">${esc(x.body||'')}</div></article>`}).join('');for(const d of as.docs){if(!read.has(d.id))await fs.setDoc(fs.doc(db,'users',user.uid,'mailboxState',d.id),{readAt:fs.serverTimestamp()},{merge:true})}}catch(e){b.querySelector('#bptMailboxList').innerHTML='<div style="color:#ff8d8d">Could not load mailbox.</div>'}};
   const openMenu=()=>{document.querySelector('.app-drawer')?.remove();const d=document.createElement('div');d.className='app-drawer';d.style.cssText='position:fixed;inset:0;z-index:9999;background:#000b';d.innerHTML='<aside style="width:min(330px,88vw);height:100%;background:#0c141f;border-right:1px solid #2a3a51;padding:22px;box-shadow:20px 0 60px #0008"><button id="bptMenuClose" class="icon" type="button" style="float:right">×</button><h2 style="margin:4px 0 6px;font-size:20px">Menu</h2><p style="color:#8997aa;font-size:11px">Account and app tools</p><div style="margin-top:22px;display:grid;gap:8px"><button id="bptMenuAccount" class="secondary" type="button" style="text-align:left">👤 Account</button><button id="bptMenuMailbox" class="secondary" type="button" style="text-align:left">📬 Mailbox</button>'+(isAdmin?'<button id="bptMenuAdmin" class="secondary" type="button" style="text-align:left">🛡️ Admin</button>':'')+'</div></aside>';document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.remove()};d.querySelector('#bptMenuClose').onclick=()=>d.remove();d.querySelector('#bptMenuAccount').onclick=account;d.querySelector('#bptMenuMailbox').onclick=mailbox;if(isAdmin)d.querySelector('#bptMenuAdmin').onclick=adminDashboard};
-  async function adminDashboard(){const b=modal('<button class="close" data-close type="button">×</button><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><h3 style="margin:0">🛡️ Admin Dashboard</h3><p style="color:#8997aa;font-size:12px;margin:5px 0">Users, performance and app administration · Spark compatible</p></div><button id="bptAnnounce" class="primary" type="button">📢 Announcement</button></div><div id="bptAdminBody" style="margin-top:18px;color:#8997aa">Loading admin data…</div>');b.querySelector('#bptAnnounce').onclick=sendAnnouncement;try{const {fs,app}=current,db=fs.getFirestore(app);const [ps,ts,us]=await Promise.all([fs.getDocs(fs.collection(db,'users')),fs.getDocs(fs.collectionGroup(db,'trades')),fs.getDocs(fs.collectionGroup(db,'usage'))]);const now=Date.now(),users=ps.docs.map(d=>({uid:d.id,...d.data(),tradeCount:0,profit:0})),active30=users.filter(u=>{const v=u.lastSeen?.toMillis?u.lastSeen.toMillis():0;return v&&now-v<30*86400000}).length,new7=users.filter(u=>{const v=u.createdAt?.toMillis?u.createdAt.toMillis():0;return v&&now-v<7*86400000}).length;const map=new Map(users.map(x=>[x.uid,x]));ts.docs.forEach(d=>{const p=d.ref.path.split('/');const u=map.get(p[1]);if(!u)return;const x=d.data()||{},cost=Number(x.cost??((Number(x.quantity)||0)*(Number(x.avgBuy)||0))),sale=Number(x.sale??((Number(x.quantity)||0)*(Number(x.sellPrice)||0)));u.tradeCount++;u.profit+=sale-cost});const body=b.querySelector('#bptAdminBody');body.innerHTML='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px"><div class="bpt-stat"><small>Registered users</small><b>'+users.length+'</b></div><div class="bpt-stat"><small>Active · 30d</small><b>'+active30+'</b></div><div class="bpt-stat"><small>New · 7d</small><b>'+new7+'</b></div><div class="bpt-stat"><small>Installations</small><b>'+us.size+'</b></div></div><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 14px;color:#718096;font-size:10px"><span>Owner: <b style="color:#55d6a0">'+esc(OWNER_USERNAME)+'</b></span><span>Installations are first launches/devices, not exact APK download counts.</span></div><input id="bptUserSearch" placeholder="Search users…" style="width:100%;margin-bottom:12px"><div id="bptUserRows"></div>';const render=()=>{const q=b.querySelector('#bptUserSearch').value.trim().toLowerCase();const arr=users.filter(u=>[u.username,u.email,u.uid].some(v=>String(v||'').toLowerCase().includes(q)));b.querySelector('#bptUserRows').innerHTML=arr.map(u=>'<div style="display:grid;grid-template-columns:minmax(150px,1.5fr) 70px 110px 180px;gap:10px;align-items:center;padding:11px 0;border-top:1px solid #1e2b3d;font-size:11px"><div><b>'+esc(u.username||'User')+'</b><small style="display:block;color:#718096">'+esc(u.email||'')+'</small></div><div>'+u.tradeCount+'</div><div>'+money(u.profit)+'</div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="secondary bpt-mini" data-view="'+esc(u.uid)+'">View</button><button class="secondary bpt-mini" data-toggle="'+esc(u.uid)+'">'+(u.disabled?'Enable':'Disable')+'</button>'+(u.uid===current.user.uid?'':'<button class="danger bpt-mini" data-delete="'+esc(u.uid)+'">Delete data</button>')+'</div></div>').join('')||'<div style="padding:24px;text-align:center;color:#8997aa">No users found.</div>';b.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>userDetails(x.dataset.view));b.querySelectorAll('[data-toggle]').forEach(x=>x.onclick=()=>toggleUser(x.dataset.toggle,!users.find(u=>u.uid===x.dataset.toggle)?.disabled));b.querySelectorAll('[data-delete]').forEach(x=>x.onclick=()=>deleteUserData(x.dataset.delete));};b.querySelector('#bptUserSearch').oninput=render;render()}catch(e){b.querySelector('#bptAdminBody').innerHTML='<div style="color:#ff8d8d">Could not load admin data: '+esc(e.message||e)+'</div>'}};
+  async function adminDashboard(){
+  if(!current){
+    try{
+      const [a,am,fs]=await loadFirebase();
+      const apps=a.getApps();
+      if(!apps[0])throw new Error('Firebase app is not ready yet.');
+      const app=apps[0],auth=am.getAuth(app),user=auth.currentUser;
+      if(!user)throw new Error('Please sign in again.');
+      current={a,am,fs,app,auth,user};
+      isAdmin=
+        String(user.email||'').toLowerCase()===OWNER_EMAIL ||
+        String(user.displayName||'').toLowerCase()===OWNER_USERNAME;
+      window.__bptAdminUid=user.uid;
+      window.__bptIsAdmin=isAdmin;
+    }catch(e){
+      alert(e.message||'Admin session is still loading. Please open Admin again.');
+      return;
+    }
+  }
+
+  const b=modal('<button class="close" data-close type="button">×</button><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><h3 style="margin:0">🛡️ Admin Dashboard</h3><p style="color:#8997aa;font-size:12px;margin:5px 0">Users, performance and app administration · Spark compatible</p></div><button id="bptAnnounce" class="primary" type="button">📢 Announcement</button></div><div id="bptAdminBody" style="margin-top:18px;color:#8997aa">Loading admin data…</div>');
+  b.querySelector('#bptAnnounce').onclick=sendAnnouncement;
+
+  try{
+    const {fs,app}=current;
+    const db=fs.getFirestore(app);
+
+    // Read the top-level users collection first. Then read each user's
+    // subcollections directly. This avoids collection-group query permission
+    // issues and works with the published owner/admin rules.
+    const ps=await fs.getDocs(fs.collection(db,'users'));
+    const users=ps.docs.map(d=>({
+      uid:d.id,
+      ...d.data(),
+      tradeCount:0,
+      profit:0,
+      installations:0
+    }));
+
+    await Promise.all(users.map(async u=>{
+      const [ts,us]=await Promise.all([
+        fs.getDocs(fs.collection(db,'users',u.uid,'trades')),
+        fs.getDocs(fs.collection(db,'users',u.uid,'usage'))
+      ]);
+      u.installations=us.size;
+      ts.docs.forEach(d=>{
+        const x=d.data()||{};
+        const cost=Number(x.cost??((Number(x.quantity)||0)*(Number(x.avgBuy)||0)));
+        const sale=Number(x.sale??((Number(x.quantity)||0)*(Number(x.sellPrice)||0)));
+        u.tradeCount++;
+        u.profit+=sale-cost;
+      });
+    }));
+
+    const now=Date.now();
+    const active30=users.filter(u=>{
+      const v=u.lastSeen?.toMillis?u.lastSeen.toMillis():0;
+      return v&&now-v<30*86400000;
+    }).length;
+    const new7=users.filter(u=>{
+      const v=u.createdAt?.toMillis?u.createdAt.toMillis():0;
+      return v&&now-v<7*86400000;
+    }).length;
+    const installations=users.reduce((n,u)=>n+u.installations,0);
+
+    const body=b.querySelector('#bptAdminBody');
+    body.innerHTML='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px"><div class="bpt-stat"><small>Registered users</small><b>'+users.length+'</b></div><div class="bpt-stat"><small>Active · 30d</small><b>'+active30+'</b></div><div class="bpt-stat"><small>New · 7d</small><b>'+new7+'</b></div><div class="bpt-stat"><small>Installations</small><b>'+installations+'</b></div></div><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 14px;color:#718096;font-size:10px"><span>Owner: <b style="color:#55d6a0">'+esc(OWNER_USERNAME)+'</b></span><span>Installations are first launches/devices, not exact APK download counts.</span></div><input id="bptUserSearch" placeholder="Search users…" style="width:100%;margin-bottom:12px"><div id="bptUserRows"></div>';
+
+    const render=()=>{
+      const q=b.querySelector('#bptUserSearch').value.trim().toLowerCase();
+      const arr=users.filter(u=>[u.username,u.email,u.uid].some(v=>String(v||'').toLowerCase().includes(q)));
+      b.querySelector('#bptUserRows').innerHTML=arr.map(u=>'<div style="display:grid;grid-template-columns:minmax(150px,1.5fr) 70px 110px 180px;gap:10px;align-items:center;padding:11px 0;border-top:1px solid #1e2b3d;font-size:11px"><div><b>'+esc(u.username||'User')+'</b><small style="display:block;color:#718096">'+esc(u.email||'')+'</small></div><div>'+u.tradeCount+'</div><div>'+money(u.profit)+'</div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="secondary bpt-mini" data-view="'+esc(u.uid)+'">View</button><button class="secondary bpt-mini" data-toggle="'+esc(u.uid)+'">'+(u.disabled?'Enable':'Disable')+'</button>'+(u.uid===current.user.uid?'':'<button class="danger bpt-mini" data-delete="'+esc(u.uid)+'">Delete data</button>')+'</div></div>').join('')||'<div style="padding:24px;text-align:center;color:#8997aa">No users found.</div>';
+
+      b.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>userDetails(x.dataset.view));
+      b.querySelectorAll('[data-toggle]').forEach(x=>x.onclick=()=>toggleUser(x.dataset.toggle,!users.find(u=>u.uid===x.dataset.toggle)?.disabled));
+      b.querySelectorAll('[data-delete]').forEach(x=>x.onclick=()=>deleteUserData(x.dataset.delete));
+    };
+
+    b.querySelector('#bptUserSearch').oninput=render;
+    render();
+  }catch(e){
+    b.querySelector('#bptAdminBody').innerHTML='<div style="color:#ff8d8d">Could not load admin data: '+esc(e.message||e)+'</div>';
+  }
+}
   window.BPT_ADMIN_DASHBOARD=adminDashboard;
   async function userDetails(uid){try{const {fs,app}=current,db=fs.getFirestore(app);const [p,t,c,u]=await Promise.all([fs.getDoc(fs.doc(db,'users',uid)),fs.getDocs(fs.collection(db,'users',uid,'trades')),fs.getDocs(fs.collection(db,'users',uid,'charges')),fs.getDocs(fs.collection(db,'users',uid,'usage'))]);const x=p.data()||{};let profit=0;t.docs.forEach(d=>{const z=d.data()||{};profit+=Number(z.sale??0)-Number(z.cost??0)});modal('<button class="close" data-close type="button">×</button><h3>'+esc(x.username||'User')+'</h3><p style="color:#8997aa;font-size:12px">'+esc(x.email||'')+' · '+(x.disabled?'Disabled':'Active')+' · '+u.size+' installation record(s)</p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0"><div class="bpt-stat"><small>Trades</small><b>'+t.size+'</b></div><div class="bpt-stat"><small>Booked profit</small><b>'+money(profit)+'</b></div><div class="bpt-stat"><small>Charges</small><b>'+c.size+'</b></div></div><h4>Trade history</h4><div style="overflow:auto"><table style="width:100%;font-size:11px"><thead><tr><th>Stock</th><th>Buy</th><th>Sell</th><th>Profit</th></tr></thead><tbody>'+t.docs.map(d=>{const z=d.data()||{};return '<tr><td>'+esc(z.ticker||z.stock||'—')+'</td><td>'+esc(z.buyDate||'—')+'</td><td>'+esc(z.sellDate||'—')+'</td><td>'+money(Number(z.sale??0)-Number(z.cost??0))+'</td></tr>'}).join('')+'</tbody></table></div>')}catch(e){alert(e.message||'Could not load user details.')}}
   async function toggleUser(uid,disabled){if(uid===current.user.uid&&disabled)return alert('You cannot disable your own administrator access.');if(!confirm(disabled?'Disable this user in the tracker?':'Enable this user in the tracker?'))return;try{const db=current.fs.getFirestore(current.app);await current.fs.setDoc(current.fs.doc(db,'users',uid),{disabled:!!disabled,disabledAt:disabled?current.fs.serverTimestamp():null},{merge:true});adminDashboard()}catch(e){alert(e.message||'Could not update user.')}}
@@ -57,18 +117,18 @@
           return;
         }
 
-        // Set the owner/admin state immediately from Firebase Auth.
-        // Do not wait for Firestore profile/usage writes: a rules error there
-        // must never hide the Admin button from the owner.
         const ownerByAuth=
           String(user.email||'').toLowerCase()===OWNER_EMAIL ||
           String(user.displayName||'').toLowerCase()===OWNER_USERNAME;
+
+        // Set owner state before any Firestore operation.
         isAdmin=ownerByAuth;
         current={a,am,fs,app,auth,user};
         window.__bptAdminUid=user.uid;
         window.__bptIsAdmin=isAdmin;
-        const menuButton=document.getElementById('bptMenuButton');
-        if(menuButton)menuButton.onclick=openMenu;
+
+        const m=document.getElementById('bptMenuButton');
+        if(m)m.onclick=openMenu;
 
         try{
           const db=fs.getFirestore(app);
@@ -114,14 +174,12 @@
               platform:navigator.platform||'',
               language:navigator.language||'',
               userAgent:navigator.userAgent||'',
-              appVersion:'v48',
+              appVersion:'v50',
               standalone:window.matchMedia?.('(display-mode: standalone)').matches===true
             },
             {merge:true}
           );
 
-          // A Firestore admins/{uid} document can grant admin to another account.
-          // The owner remains admin even if this lookup is denied by rules.
           try{
             const ar=await fs.getDoc(fs.doc(db,'admins',user.uid));
             isAdmin=ownerByAuth || (ar.exists()&&ar.data()?.admin===true);
@@ -130,17 +188,14 @@
           }
 
           window.__bptIsAdmin=isAdmin;
-          window.__bptAdminUid=user.uid;
-          const m=document.getElementById('bptMenuButton');
-          if(m)m.onclick=openMenu;
+          const mm=document.getElementById('bptMenuButton');
+          if(mm)mm.onclick=openMenu;
         }catch(e){
-          // Keep owner recognition alive even when telemetry/profile writes are
-          // blocked by an older deployed Firestore ruleset.
           isAdmin=ownerByAuth;
           window.__bptIsAdmin=isAdmin;
           window.__bptAdminUid=user.uid;
-          const m=document.getElementById('bptMenuButton');
-          if(m)m.onclick=openMenu;
+          const mm=document.getElementById('bptMenuButton');
+          if(mm)mm.onclick=openMenu;
           console.error('BPT admin bootstrap Firestore step failed',e);
         }
       });
