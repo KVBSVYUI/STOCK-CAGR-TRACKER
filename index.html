@@ -227,7 +227,17 @@ html.bpt-phone .delete,body.bpt-phone .delete{font-size:22px}
 @media(max-width:800px){.fund-row{grid-template-columns:1fr auto 28px}.fund-stat:nth-child(2){display:none}.fund-result{text-align:right}.fund-info b{font-size:12px}}
 @media(max-width:600px){.profit-breakdown{gap:6px}.profit-chip{padding:6px 8px}.fund-list{padding:0 8px 8px}.fund-row{grid-template-columns:1fr auto 24px;gap:8px;padding:13px 4px;min-height:68px}.fund-info b{font-size:13px}.fund-info span{font-size:9px}.fund-result .profit{font-size:14px}.fund-result .return{font-size:10px}.fund-delete{font-size:19px}}
 </style></head>
-<body><div id="root"></div>
+<body><div id="root"><main class="auth"><div class="auth-card"><h2>Loading Booked Profit Tracker…</h2><p id="bootStatus">Starting the app…</p></div></main></div>
+<script>
+window.addEventListener('error',function(e){
+  var el=document.getElementById('bootStatus');
+  if(el && (!document.querySelector('.app') || !document.querySelector('.auth input'))) el.textContent='App startup error: '+(e.message||'JavaScript failed to start')+' — please reopen this page.';
+});
+window.addEventListener('unhandledrejection',function(e){
+  var el=document.getElementById('bootStatus');
+  if(el && !document.querySelector('.app')) el.textContent='App startup error: '+((e.reason&&e.reason.message)||e.reason||'Module failed to load')+' — please reopen this page.';
+});
+</script>
 <script>
 (function(){
   var w=(window.visualViewport&&window.visualViewport.width)||window.innerWidth||document.documentElement.clientWidth;
