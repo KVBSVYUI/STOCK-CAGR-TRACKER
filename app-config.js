@@ -15,6 +15,7 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
   let done=false;
   function account(){
     document.querySelectorAll('.app-drawer,.modal-back').forEach(x=>x.remove());
+    if(window.BPT_ACCOUNT_MODAL){window.BPT_ACCOUNT_MODAL();return}
     const back=document.createElement('div');back.className='modal-back open';
     back.innerHTML='<div class="modal"><button class="close" id="bptAccountClose" type="button">×</button><h3>Account</h3><p>Manage your account and sign out securely.</p><div class="modal-actions"><button class="secondary" id="bptSignOut" type="button">Sign out</button></div></div>';
     document.body.appendChild(back);
@@ -161,7 +162,7 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
       if(!m.onclick)m.onclick=menu;
       let a=document.getElementById('bptAccountButton');
       if(!a){a=document.createElement('button');a.id='bptAccountButton';a.type='button';a.className='icon';a.textContent='👤';a.title='Account';a.setAttribute('aria-label','Account');right.insertBefore(a,right.firstChild);a.onclick=account}
-      const s=document.getElementById('settings');if(s)s.onclick=account;
+      const s=document.getElementById('settings');if(s)s.onclick=()=>{if(window.BPT_SETTINGS_MODAL)window.BPT_SETTINGS_MODAL();else account()};
       const add=document.getElementById('addTradeOpen');if(add&&!add.dataset.bptStockHook){add.dataset.bptStockHook='1';add.addEventListener('click',()=>{setTimeout(()=>{stockAutocomplete();patchSameDaySave();const i=document.getElementById('mTicker');if(i)i.focus()},0)})}
       done=true;
     }
