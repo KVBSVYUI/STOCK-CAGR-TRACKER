@@ -90,7 +90,7 @@ import('./admin.js').catch(()=>{});
       const user=a.currentUser;
       if(!user)return alert('Please sign in again.');
       const db=fs.getFirestore(appMod.getApps()[0]);
-      const companyName=KNOWN_STOCK_NAMES[ticker]||document.getElementById('mTicker')?.dataset.selectedCompany||ticker;const exchange=document.getElementById('mTicker')?.dataset.selectedExchange||'NSE';const isin=document.getElementById('mTicker')?.dataset.selectedIsin||'';await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,companyName,exchange,isin,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:stockLogoUrl({ticker,exchange,isin}),createdAt:fs.serverTimestamp()});
+      const resolved=window.BPT_STOCK_RESOLVE?await window.BPT_STOCK_RESOLVE(ticker):{name:KNOWN_STOCK_NAMES[ticker]||document.getElementById('mTicker')?.dataset.selectedCompany||ticker,exchange:document.getElementById('mTicker')?.dataset.selectedExchange||'NSE',isin:document.getElementById('mTicker')?.dataset.selectedIsin||''};const companyName=resolved.name||ticker;const exchange=resolved.exchange||'NSE';const isin=resolved.isin||'';await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,companyName,exchange,isin,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:stockLogoUrl({ticker,exchange,isin}),createdAt:fs.serverTimestamp()});
       document.querySelector('.modal-back.open')?.remove();
     }catch(e){alert('Could not save trade: '+(e.code||'error'));}
     return true;
