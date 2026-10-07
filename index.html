@@ -132,15 +132,42 @@ html.bpt-phone .return{font-size:10px;white-space:nowrap}
   .trade-result .profit{font-size:15px;white-space:nowrap}
   .return{font-size:10px;white-space:nowrap}
 }
+</style><style>
+/* v32: exact large mobile presentation requested for Samsung/Android */
+html.bpt-phone body{font-size:16px}
+html.bpt-phone .app,body.bpt-phone .app{width:100%;max-width:none;margin:0;padding:18px 12px 60px}
+html.bpt-phone .top,body.bpt-phone .top{margin-bottom:18px}
+html.bpt-phone .brand h1,body.bpt-phone .brand h1{font-size:19px}
+html.bpt-phone .hero,body.bpt-phone .hero{padding:22px;border-radius:20px}
+html.bpt-phone .profit,body.bpt-phone .profit{font-size:40px;line-height:1.05}
+html.bpt-phone .kpis,body.bpt-phone .kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+html.bpt-phone .kpi,body.bpt-phone .kpi{padding:13px 10px}
+html.bpt-phone .kpi .label,body.bpt-phone .kpi .label{font-size:9px}
+html.bpt-phone .kpi .value,body.bpt-phone .kpi .value{font-size:16px;white-space:nowrap}
+html.bpt-phone .actions,body.bpt-phone .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+html.bpt-phone .actions .primary,body.bpt-phone .actions .primary{grid-column:1/-1}
+html.bpt-phone .primary,html.bpt-phone .secondary,body.bpt-phone .primary,body.bpt-phone .secondary{min-height:44px;font-size:13px;width:100%}
+html.bpt-phone .section-head,body.bpt-phone .section-head{padding:17px 14px 12px}
+html.bpt-phone .title,body.bpt-phone .title{font-size:16px}
+html.bpt-phone .sub,body.bpt-phone .sub{font-size:10px}
+html.bpt-phone .trades,body.bpt-phone .trades{padding:0 8px 10px}
+html.bpt-phone .trade,body.bpt-phone .trade{grid-template-columns:58px minmax(0,1fr) auto 28px;gap:10px;padding:18px 4px;min-height:96px}
+html.bpt-phone .trade .stat,body.bpt-phone .trade .stat{display:none}
+html.bpt-phone .logo,body.bpt-phone .logo{width:58px;height:58px;border-radius:15px}
+html.bpt-phone .trade-main b,body.bpt-phone .trade-main b{font-size:17px;line-height:1.2}
+html.bpt-phone .trade-main span,body.bpt-phone .trade-main span{font-size:11px;line-height:1.35;white-space:normal}
+html.bpt-phone .trade-result .profit,body.bpt-phone .trade-result .profit{font-size:16px;white-space:nowrap}
+html.bpt-phone .return,body.bpt-phone .return{font-size:11px;white-space:nowrap}
+html.bpt-phone .delete,body.bpt-phone .delete{font-size:22px}
 </style></head>
 <body><div id="root"></div>
 <script>
 (function(){
   var w=(window.visualViewport&&window.visualViewport.width)||window.innerWidth||document.documentElement.clientWidth;
   var phone=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||window.matchMedia('(display-mode: standalone)').matches||w<=600||((window.screen&&window.screen.width<=600));
-  document.documentElement.classList.toggle('bpt-phone',phone);
+  document.documentElement.classList.toggle('bpt-phone',phone); document.body.classList.toggle('bpt-phone',phone);
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js?v=30',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=32',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
   }
 })();
 </script>
