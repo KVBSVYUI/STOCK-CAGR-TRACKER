@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mohitx12.bookedprofittracker",
+      "sha256_cert_fingerprints": [
+        "CB:10:6C:E0:0D:04:13:F4:D9:F2:0E:B2:60:65:F4:3C:62:6C:99:EF:38:DB:06:99:8A:01:5D:46:6C:3B:53:9C"
+      ]
+    }
+  }
+]
