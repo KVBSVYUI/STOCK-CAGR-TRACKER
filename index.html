@@ -388,5 +388,16 @@ function appSettingsModal(){
 window.BPT_ACCOUNT_MODAL=accountModal;
 window.BPT_SETTINGS_MODAL=appSettingsModal;
 function exportData(){const data={exportedAt:new Date().toISOString(),trades,charges,fundProfits};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='booked-profit-tracker-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
-function init(){if(!CONFIG.firebase?.apiKey||CONFIG.firebase.apiKey.includes('PASTE_')){root.innerHTML='<main class="auth"><div class="auth-card"><h2>One-time setup needed</h2><p>Add the Firebase web configuration to app-config.js.</p></div></main>';return}app=initializeApp(CONFIG.firebase);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,user=>{if(!user){if(unsubTrades)unsubTrades();if(unsubCharges)unsubCharges();if(unsubFundProfits)unsubFundProfits();authScreen('login');return}appShell();const base=['users',user.uid];unsubTrades=onSnapshot(query(collection(db,...base,'trades'),orderBy('sellDate','desc')),s=>{trades=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for trades. Check Firestore rules.'));unsubCharges=onSnapshot(query(collection(db,...base,'charges'),orderBy('date','desc')),s=>{charges=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for charges. Check Firestore rules.'));unsubFundProfits=onSnapshot(query(collection(db,...base,'fundProfits'),orderBy('date','desc')),s=>{fundProfits=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for mutual fund profits. Check Firestore rules.'))})}init();
+function prepareTwaFirstLaunch(){
+  // PWABuilder/TWA uses the same web origin storage as Chrome. On the first
+  // launch of the installed app, clear any browser-persisted Firebase session
+  // so a fresh install always starts at the login screen.
+  const isAppLaunch=new URLSearchParams(location.search).get('pwa')==='v47';
+  if(!isAppLaunch)return;
+  const key='bpt_twa_login_initialized_v1';
+  if(localStorage.getItem(key)==='1')return;
+  localStorage.setItem(key,'1');
+  if(auth.currentUser)signOut(auth).catch(()=>{});
+}
+function init(){if(!CONFIG.firebase?.apiKey||CONFIG.firebase.apiKey.includes('PASTE_')){root.innerHTML='<main class="auth"><div class="auth-card"><h2>One-time setup needed</h2><p>Add the Firebase web configuration to app-config.js.</p></div></main>';return}app=initializeApp(CONFIG.firebase);auth=getAuth(app);db=getFirestore(app);prepareTwaFirstLaunch();onAuthStateChanged(auth,user=>{if(!user){if(unsubTrades)unsubTrades();if(unsubCharges)unsubCharges();if(unsubFundProfits)unsubFundProfits();authScreen('login');return}appShell();const base=['users',user.uid];unsubTrades=onSnapshot(query(collection(db,...base,'trades'),orderBy('sellDate','desc')),s=>{trades=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for trades. Check Firestore rules.'));unsubCharges=onSnapshot(query(collection(db,...base,'charges'),orderBy('date','desc')),s=>{charges=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for charges. Check Firestore rules.'));unsubFundProfits=onSnapshot(query(collection(db,...base,'fundProfits'),orderBy('date','desc')),s=>{fundProfits=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>alert('Cloud sync failed for mutual fund profits. Check Firestore rules.'))})}init();
 </script></body></html>
