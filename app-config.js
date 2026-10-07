@@ -26,11 +26,12 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
   function menu(){
     document.querySelector('.app-drawer')?.remove();
     const d=document.createElement('div');d.className='app-drawer';d.style.cssText='position:fixed;inset:0;z-index:9999;background:#000b';
-    d.innerHTML='<aside style="width:min(330px,88vw);height:100%;background:#0c141f;border-right:1px solid #2a3a51;padding:22px;box-shadow:20px 0 60px #0008"><button id="bptMenuClose" class="icon" type="button" style="float:right">×</button><h2 style="margin:4px 0 6px;font-size:20px">Menu</h2><p style="color:#8997aa;font-size:11px">Account and app tools</p><div style="margin-top:22px;display:grid;gap:8px"><button id="bptMenuAccount" class="secondary" type="button" style="text-align:left">👤 Account</button><button id="bptMenuMailbox" class="secondary" type="button" style="text-align:left">📬 Mailbox</button>'+((window.__bptIsAdmin===true)?'<button id="bptMenuAdmin" class="secondary" type="button" style="text-align:left">🛡️ Admin</button>':'')+'</div></aside>';
+    d.innerHTML='<aside style="width:min(330px,88vw);height:100%;background:#0c141f;border-right:1px solid #2a3a51;padding:22px;box-shadow:20px 0 60px #0008"><button id="bptMenuClose" class="icon" type="button" style="float:right">×</button><h2 style="margin:4px 0 6px;font-size:20px">Menu</h2><p style="color:#8997aa;font-size:11px">Account and app tools</p><div style="margin-top:22px;display:grid;gap:8px"><button id="bptMenuAccount" class="secondary" type="button" style="text-align:left">👤 Account</button><button id="bptMenuMailbox" class="secondary" type="button" style="text-align:left">📬 Mailbox</button><button id="bptMenuFunds" class="secondary" type="button" style="text-align:left">📈 Mutual Funds</button>'+((window.__bptIsAdmin===true)?'<button id="bptMenuAdmin" class="secondary" type="button" style="text-align:left">🛡️ Admin</button>':'')+'</div></aside>';
     document.body.appendChild(d);
     document.getElementById('bptMenuClose').onclick=()=>d.remove();
     document.getElementById('bptMenuAccount').onclick=account;
     document.getElementById('bptMenuMailbox').onclick=()=>alert('Mailbox will be connected after the click issue is fully fixed.');
+    document.getElementById('bptMenuFunds').onclick=()=>{d.remove();if(window.BPT_FUND_PROFIT_MODAL){window.BPT_FUND_PROFIT_MODAL();return}const b=document.getElementById('addFundOpen');if(b)b.click()};
     const ad=document.getElementById('bptMenuAdmin');if(ad)ad.onclick=()=>window.BPT_ADMIN_DASHBOARD&&window.BPT_ADMIN_DASHBOARD();
     d.onclick=e=>{if(e.target===d)d.remove()};
   }
