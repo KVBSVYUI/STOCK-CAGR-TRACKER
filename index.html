@@ -25,25 +25,6 @@
 @media(max-width:800px){.trade{grid-template-columns:44px 1fr 120px 32px}.trade .stat{display:none}.trade-result{text-align:right}.form{grid-template-columns:1fr 1fr 1fr}.form .company{grid-column:1/-1}.form .full{grid-column:1/-1}.kpis{grid-template-columns:1fr 1fr}}
 @media (display-mode:standalone){body{padding-top:28px}.app{padding-top:18px}.auth{padding-top:18px}}@media(max-width:560px){.charge-row{grid-template-columns:1fr auto;gap:6px}.charge-amount{text-align:left}.charge-actions{justify-content:flex-start}.app{padding:calc(12px + env(safe-area-inset-top,0px)) 10px calc(42px + env(safe-area-inset-bottom,0px))}.top{margin-bottom:12px}.sync{display:none}.hero{padding:18px}.hero-top{display:block}.year{margin-top:13px}.profit{font-size:36px}.kpis{gap:7px}.kpi{padding:11px}.kpi .value{font-size:15px}.form{grid-template-columns:1fr 1fr}.section-head{padding:15px 14px 11px}.trades{padding:0 9px 9px}.trade{grid-template-columns:42px 1fr auto;gap:9px;padding:13px 4px}.logo{width:39px;height:39px}.trade-result .profit{font-size:12px}.trade-main b{font-size:12px}.detail-grid,.modal-grid{grid-template-columns:1fr}.modal-grid .field.full{grid-column:auto}.hero-sub{max-width:310px}}
 </style>
-<script>
-(function(){
-  try{
-    var key='bpt-clean-install-v33';
-    if(!sessionStorage.getItem(key)){
-      sessionStorage.setItem(key,'1');
-      if('serviceWorker' in navigator){
-        navigator.serviceWorker.getRegistrations().then(function(rs){
-          return Promise.all(rs.map(function(r){return r.unregister()}));
-        }).then(function(){
-          return caches && caches.keys ? caches.keys().then(function(ks){
-            return Promise.all(ks.map(function(k){return caches.delete(k)}));
-          }) : null;
-        }).then(function(){ location.replace('./?app=v33&recovered=1'); }).catch(function(){});
-      }
-    }
-  }catch(e){}
-})();
-</script>
 <script src="app-config.js"></script>
 <style>
 /* S23 Ultra / touch-device mobile layout: prevent desktop 980px canvas from being scaled down */
@@ -87,7 +68,7 @@
   .kpis{width:100%}
   .card{width:100%}
 }
-<style>
+</style><style>
 /* v30: force readable phone presentation and prevent an old 980px PWA shell from surviving */
 html.bpt-phone .app{width:100%;max-width:none;margin:0;padding:18px 12px 54px}
 html.bpt-phone .top{margin-bottom:16px}
@@ -253,7 +234,7 @@ html.bpt-phone .delete,body.bpt-phone .delete{font-size:22px}
   var phone=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||window.matchMedia('(display-mode: standalone)').matches||w<=600||((window.screen&&window.screen.width<=600));
   document.documentElement.classList.toggle('bpt-phone',phone); document.body.classList.toggle('bpt-phone',phone);
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js?v=35',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=36',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
   }
 })();
 </script>
