@@ -50,6 +50,20 @@ import('./admin.js').catch(()=>{});
     }).catch(()=>[]);
     return stockCatalogPromise;
   }
+  function findStock(catalog,ticker){
+    const q=String(ticker||'').trim().toUpperCase().replace(/\\s+/g,'');
+    if(!q)return null;
+    return catalog.find(x=>x.ticker===q&&x.exchange==='NSE')||catalog.find(x=>x.ticker===q)||null;
+  }
+  window.BPT_STOCK_RESOLVE=async function(ticker){
+    const q=String(ticker||'').trim().toUpperCase().replace(/\\s+/g,'');
+    if(!q)return {ticker:q,name:'',exchange:'NSE',isin:''};
+    const catalog=await loadStocks();
+    const hit=findStock(catalog,q);
+    if(hit)return hit;
+    if(KNOWN_STOCK_NAMES[q])return {ticker:q,name:KNOWN_STOCK_NAMES[q],exchange:'NSE',isin:''};
+    return {ticker:q,name:q,exchange:'NSE',isin:''};
+  };
   function stockAutocomplete(){
     const input=document.getElementById('mTicker');
     if(!input||input.dataset.stockAutocomplete)return;
@@ -60,8 +74,8 @@ import('./admin.js').catch(()=>{});
     const clean=s=>String(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]));
     let catalog=[];
     const render=items=>{box.innerHTML=items.slice(0,8).map((x,i)=>`<button type="button" data-stock-index="${i}" style="display:flex;width:100%;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid #202b3b;background:#0b1421;color:#f4f7fb;cursor:pointer"><span style="width:32px;height:32px;border-radius:8px;background:#172438;display:grid;place-items:center;overflow:hidden;flex:none;font-size:9px;font-weight:800"><img src="${stockLogoUrl(x)}" style="width:100%;height:100%;object-fit:contain;background:#fff" onerror="this.style.display='none';this.parentElement.textContent='${clean(x.ticker).slice(0,2)}'"></span><span style="min-width:0"><b style="display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${clean(x.name)}</b><small style="display:block;color:#8997aa;margin-top:2px">${clean(x.ticker)} · ${clean(x.exchange)}</small></span></button>`).join('');box.style.display=items.length?'block':'none';box.querySelectorAll('[data-stock-index]').forEach(b=>b.onclick=()=>{const x=items[Number(b.dataset.stockIndex)];if(!x)return;input.value=x.ticker;input.dataset.selectedCompany=x.name;input.dataset.selectedExchange=x.exchange;input.dataset.selectedIsin=x.isin||'';box.style.display='none'})};
-    input.addEventListener('input',async()=>{const q=input.value.trim().toLowerCase();if(!q){box.style.display='none';return}catalog=await loadStocks();const matches=catalog.filter(x=>x.ticker.toLowerCase().startsWith(q)||x.name.toLowerCase().includes(q)).sort((a,b)=>{const score=x=>x.ticker.toLowerCase()===q?0:x.ticker.toLowerCase().startsWith(q)?1:x.name.toLowerCase().startsWith(q)?2:3;return score(a)-score(b)||a.name.localeCompare(b.name)});render(matches)});
-    input.addEventListener('focus',()=>{if(input.value.trim())input.dispatchEvent(new Event('input'))});
+    input.addEventListener('input',async()=>{const raw=input.value.trim();const q=raw.toLowerCase();if(!q){box.style.display='none';return}catalog=await loadStocks();const exact=findStock(catalog,raw);if(exact){input.dataset.selectedCompany=exact.name;input.dataset.selectedExchange=exact.exchange;input.dataset.selectedIsin=exact.isin||''}else{delete input.dataset.selectedCompany;delete input.dataset.selectedExchange;delete input.dataset.selectedIsin}const matches=catalog.filter(x=>x.ticker.toLowerCase().startsWith(q)||x.name.toLowerCase().includes(q)).sort((a,b)=>{const score=x=>x.ticker.toLowerCase()===q?0:x.ticker.toLowerCase().startsWith(q)?1:x.name.toLowerCase().startsWith(q)?2:3;return score(a)-score(b)||a.name.localeCompare(b.name)});render(matches)});
+    input.addEventListener('focus',()=>{loadStocks();if(input.value.trim())input.dispatchEvent(new Event('input'))});
     document.addEventListener('click',e=>{if(!field.contains(e.target))box.style.display='none'});
   }
   async function saveSameDayTrade(){
@@ -128,6 +142,7 @@ import('./admin.js').catch(()=>{});
       done=true;
     }
     stockAutocomplete();
+    loadStocks();
     patchSameDaySave();
   }
   function start(){sameDayTradeGuard();apply();let n=0;const timer=setInterval(()=>{apply();if(++n>=80||done)clearInterval(timer)},250)}
