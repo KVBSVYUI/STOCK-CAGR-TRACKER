@@ -8,6 +8,18 @@ import('./admin.js').catch(()=>{});
   const FIREBASE_FIRESTORE='https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
   const getAuth=async()=>{const [a,m]=await Promise.all([import(FIREBASE_APP),import(FIREBASE_AUTH)]);return m.getAuth(a.getApps()[0])};
   const STOCK_BASE='https://dharunashokkumar.github.io/indian-listed-company-logos/';
+  const IPO_CATALOG=[
+    {ticker:'MONEYVIEW',name:'Moneyview Financial Services Ltd',exchange:'NSE'},
+    {ticker:'ORIENTCABLES',name:'Orient Cables (India) Ltd',exchange:'NSE'},
+    {ticker:'SRIT',name:'SRIT India Ltd',exchange:'NSE'},
+    {ticker:'BENCHMARK',name:'Bench Mark Infotech Services Ltd',exchange:'NSE'},
+    {ticker:'SHAH',name:'Shah Investor’s Home Ltd',exchange:'NSE'},
+    {ticker:'ACMEINDIA',name:'Acme India Industries Ltd',exchange:'BSE'},
+    {ticker:'PARAMOUNTSYNTEX',name:'Paramount Syntex Ltd',exchange:'BSE'},
+    {ticker:'OMARA',name:'Omara Ventures India Ltd',exchange:'BSE'},
+    {ticker:'EVENTIONS',name:'Eventions Ltd',exchange:'NSE'},
+    {ticker:'VANSELECTRO',name:'Vans Electroengineerings Ltd',exchange:'BSE'}
+  ];
   let stockCatalogPromise=null;
   let done=false;
   function account(){
@@ -33,7 +45,7 @@ import('./admin.js').catch(()=>{});
     if(stockCatalogPromise)return stockCatalogPromise;
     stockCatalogPromise=fetch(STOCK_BASE+'data/logos.json',{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error('stock list unavailable');return r.json()}).then(data=>{
       const seen=new Set();
-      return (data.logos||[]).map(x=>({ticker:String(x.ticker||'').toUpperCase(),name:String(x.company||x.name||x.ticker||''),exchange:String(x.exchange||'NSE').toUpperCase()})).filter(x=>x.ticker&&x.name).filter(x=>{const key=x.exchange+'|'+x.ticker;if(seen.has(key))return false;seen.add(key);return true});
+      return [...IPO_CATALOG,...(data.logos||[])].map(x=>({ticker:String(x.ticker||'').toUpperCase(),name:String(x.company||x.name||x.ticker||''),exchange:String(x.exchange||'NSE').toUpperCase()})).filter(x=>x.ticker&&x.name).filter(x=>{const key=x.exchange+'|'+x.ticker;if(seen.has(key))return false;seen.add(key);return true});
     }).catch(()=>[]);
     return stockCatalogPromise;
   }
@@ -63,7 +75,7 @@ import('./admin.js').catch(()=>{});
       const user=a.currentUser;
       if(!user)return alert('Please sign in again.');
       const db=fs.getFirestore(appMod.getApps()[0]);
-      await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:STOCK_BASE+'nse/NSE_'+encodeURIComponent(ticker)+'.svg',createdAt:fs.serverTimestamp()});
+      const companyName=document.getElementById('mTicker')?.dataset.selectedCompany||ticker;const exchange=document.getElementById('mTicker')?.dataset.selectedExchange||'NSE';await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,companyName,exchange,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:STOCK_BASE+(exchange==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(ticker)+'.svg',createdAt:fs.serverTimestamp()});
       document.querySelector('.modal-back.open')?.remove();
     }catch(e){alert('Could not save trade: '+(e.code||'error'));}
     return true;
