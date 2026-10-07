@@ -1,4 +1,4 @@
-const CACHE='booked-profit-tracker-final-v22';
+const CACHE='booked-profit-tracker-final-v23';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./app-config.js','./stock-catalog.json','./admin.js'];
 const ADMIN_FIX="async function setupMenu(){if(booted)return;booted=true;try{const st=await ensureProfile();if(!st?.user)return;";
 const ADMIN_FIXED="async function setupMenu(){if(booted)return;try{const [a,am]=await Promise.all([import(APP),import(AUTH)]);const app=a.getApps()[0],auth=am.getAuth(app);const u=await new Promise(resolve=>{const off=am.onAuthStateChanged(auth,user=>{off();resolve(user)})});if(!u)return;booted=true;const st=await ensureProfile();if(!st?.user)return;";
