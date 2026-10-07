@@ -10,7 +10,8 @@ import('./admin.js').catch(()=>{});
   const STOCK_BASE='https://dharunashokkumar.github.io/indian-listed-company-logos/';
   const LOCAL_CATALOG='stock-catalog.json';
   const LIVE_CATALOG='https://bharatgraph.byvaibhav.com/api/company';
-  const stockLogoUrl=x=>x?.isin?'https://company-logo.shareperks.in/logo/'+encodeURIComponent(String(x.isin).toUpperCase())+'/icon.svg':STOCK_BASE+(String(x?.exchange||'NSE').toUpperCase()==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(String(x?.ticker||'').toUpperCase())+'.svg';
+  const SPECIAL_LOGO_DOMAINS={VOGL:'vedantaoilandgas.com',SHIPROCKET:'shiprocket.in',BLEL:'beharilalengineering.com',SUNSHINE:'sunshinepictures.in'};
+  const stockLogoUrl=x=>{const t=String(x?.ticker||'').toUpperCase();if(SPECIAL_LOGO_DOMAINS[t])return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(SPECIAL_LOGO_DOMAINS[t])+'&sz=128';return x?.isin?'https://company-logo.shareperks.in/logo/'+encodeURIComponent(String(x.isin).toUpperCase())+'/icon.svg':STOCK_BASE+(String(x?.exchange||'NSE').toUpperCase()==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(t)+'.svg'};
   let stockCatalogPromise=null;
   let done=false;
   function account(){
