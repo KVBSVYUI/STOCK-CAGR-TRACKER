@@ -17,8 +17,12 @@ service cloud.firestore {
         );
     }
 
+    function owner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
     function activeOwner(uid) {
-      return signedIn() && request.auth.uid == uid
+      return owner(uid)
         && (!exists(/databases/$(database)/documents/users/$(uid))
             || get(/databases/$(database)/documents/users/$(uid)).data.disabled != true);
     }
@@ -48,7 +52,7 @@ service cloud.firestore {
 
     // Each user's trades remain private. Admins can read/manage them.
     match /users/{userId}/trades/{tradeId} {
-      allow read, write: if activeOwner(userId) || isAdmin();
+      allow read, write: if owner(userId) || isAdmin();
     }
     match /{path=**}/trades/{tradeId} {
       allow read, write: if isAdmin();
@@ -56,12 +60,12 @@ service cloud.firestore {
 
     // Charges remain private to the owner or an administrator.
     match /users/{userId}/charges/{documentId} {
-      allow read, write: if activeOwner(userId) || isAdmin();
+      allow read, write: if owner(userId) || isAdmin();
     }
 
     // Mutual fund / silver-fund booked profits remain private to the owner or an administrator.
     match /users/{userId}/fundProfits/{documentId} {
-      allow read, write: if activeOwner(userId) || isAdmin();
+      allow read, write: if owner(userId) || isAdmin();
     }
     match /{path=**}/fundProfits/{documentId} {
       allow read, write: if isAdmin();
@@ -72,7 +76,7 @@ service cloud.firestore {
 
     // Usage / installation records are private to the owner or an administrator.
     match /users/{userId}/usage/{documentId} {
-      allow read, write: if activeOwner(userId) || isAdmin();
+      allow read, write: if owner(userId) || isAdmin();
     }
     match /{path=**}/usage/{documentId} {
       allow read, write: if isAdmin();
@@ -80,7 +84,7 @@ service cloud.firestore {
 
     // Mailbox read-state is private to each user.
     match /users/{userId}/mailboxState/{messageId} {
-      allow read, write: if activeOwner(userId) || isAdmin();
+      allow read, write: if owner(userId) || isAdmin();
     }
 
     // Announcements are visible to signed-in users; only admins can publish/change them.
