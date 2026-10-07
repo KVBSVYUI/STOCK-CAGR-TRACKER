@@ -56,7 +56,7 @@ import('./admin.js').catch(()=>{});
     return catalog.find(x=>x.ticker===q&&x.exchange==='NSE')||catalog.find(x=>x.ticker===q)||null;
   }
   window.BPT_STOCK_RESOLVE=async function(ticker){
-    const q=String(ticker||'').trim().toUpperCase().replace(/\\s+/g,'');
+    const q=String(ticker||'').trim().toUpperCase().replace(/\s+/g,'');
     if(!q)return {ticker:q,name:'',exchange:'NSE',isin:''};
     const catalog=await loadStocks();
     const hit=findStock(catalog,q);
@@ -74,8 +74,33 @@ import('./admin.js').catch(()=>{});
     const clean=s=>String(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]));
     let catalog=[];
     const render=items=>{box.innerHTML=items.slice(0,8).map((x,i)=>`<button type="button" data-stock-index="${i}" style="display:flex;width:100%;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid #202b3b;background:#0b1421;color:#f4f7fb;cursor:pointer"><span style="width:32px;height:32px;border-radius:8px;background:#172438;display:grid;place-items:center;overflow:hidden;flex:none;font-size:9px;font-weight:800"><img src="${stockLogoUrl(x)}" style="width:100%;height:100%;object-fit:contain;background:#fff" onerror="this.style.display='none';this.parentElement.textContent='${clean(x.ticker).slice(0,2)}'"></span><span style="min-width:0"><b style="display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${clean(x.name)}</b><small style="display:block;color:#8997aa;margin-top:2px">${clean(x.ticker)} · ${clean(x.exchange)}</small></span></button>`).join('');box.style.display=items.length?'block':'none';box.querySelectorAll('[data-stock-index]').forEach(b=>b.onclick=()=>{const x=items[Number(b.dataset.stockIndex)];if(!x)return;input.value=x.ticker;input.dataset.selectedCompany=x.name;input.dataset.selectedExchange=x.exchange;input.dataset.selectedIsin=x.isin||'';box.style.display='none'})};
-    const QUICK_STOCKS=[{ticker:'RELIANCE',name:'Reliance Industries Limited',exchange:'NSE',isin:'INE002A01018'},{ticker:'TCS',name:'Tata Consultancy Services Limited',exchange:'NSE',isin:'INE467B01029'},{ticker:'INFY',name:'Infosys Limited',exchange:'NSE',isin:'INE009A01021'},{ticker:'HDFCBANK',name:'HDFC Bank Limited',exchange:'NSE',isin:'INE040A01034'},{ticker:'ICICIBANK',name:'ICICI Bank Limited',exchange:'NSE',isin:'INE090A01021'}];input.addEventListener('input',async()=>{const raw=input.value.trim();const q=raw.toLowerCase();if(!q){box.style.display='none';return}const quick=QUICK_STOCKS;const merged=[...quick,...catalog];const seen=new Set();catalog=merged.filter(x=>{const k=x.exchange+'|'+x.ticker;if(seen.has(k))return false;seen.add(k);return true});const exact=findStock(catalog,raw);if(exact){input.dataset.selectedCompany=exact.name;input.dataset.selectedExchange=exact.exchange;input.dataset.selectedIsin=exact.isin||''}else{delete input.dataset.selectedCompany;delete input.dataset.selectedExchange;delete input.dataset.selectedIsin}const nq=q.replace(/[^a-z0-9]/g,'');const matches=catalog.filter(x=>{const ticker=x.ticker.toLowerCase(),name=x.name.toLowerCase(),compactTicker=ticker.replace(/[^a-z0-9]/g,'');return ticker.startsWith(q)||compactTicker.startsWith(nq)||name.startsWith(q)||name.includes(q)}).sort((a,b)=>{const score=x=>{const ticker=x.ticker.toLowerCase(),name=x.name.toLowerCase();return ticker===q?0:ticker.startsWith(q)?1:name.startsWith(q)?2:name.includes(q)?3:4};return score(a)-score(b)||a.name.localeCompare(b.name)});render(matches)});
-    input.addEventListener('focus',()=>{loadStocks().then(x=>{catalog=x;if(input.value.trim())input.dispatchEvent(new Event('input'))});if(input.value.trim())input.dispatchEvent(new Event('input'))});
+    const QUICK_STOCKS=[{ticker:'RELIANCE',name:'Reliance Industries Limited',exchange:'NSE',isin:'INE002A01018'},{ticker:'TCS',name:'Tata Consultancy Services Limited',exchange:'NSE',isin:'INE467B01029'},{ticker:'INFY',name:'Infosys Limited',exchange:'NSE',isin:'INE009A01021'},{ticker:'HDFCBANK',name:'HDFC Bank Limited',exchange:'NSE',isin:'INE040A01034'},{ticker:'ICICIBANK',name:'ICICI Bank Limited',exchange:'NSE',isin:'INE090A01021'}];
+    const updateResults=raw=>{
+      const q=String(raw||'').trim().toLowerCase();
+      if(!q){box.style.display='none';return}
+      const merged=[...QUICK_STOCKS,...catalog],seen=new Set();
+      const pool=merged.filter(x=>{const k=x.exchange+'|'+x.ticker;if(seen.has(k))return false;seen.add(k);return true});
+      const nq=q.replace(/[^a-z0-9]/g,'');
+      const matches=pool.filter(x=>{
+        const ticker=x.ticker.toLowerCase(),name=x.name.toLowerCase(),compactTicker=ticker.replace(/[^a-z0-9]/g,'');
+        return ticker.startsWith(q)||compactTicker.startsWith(nq)||name.startsWith(q)||name.includes(q);
+      }).sort((a,b)=>{
+        const score=x=>{const ticker=x.ticker.toLowerCase(),name=x.name.toLowerCase();return ticker===q?0:ticker.startsWith(q)?1:name.startsWith(q)?2:name.includes(q)?3:4};
+        return score(a)-score(b)||a.name.localeCompare(b.name);
+      });
+      render(matches);
+    };
+    input.addEventListener('input',()=>{
+      const raw=input.value.trim(),exact=findStock([...QUICK_STOCKS,...catalog],raw);
+      if(exact){input.dataset.selectedCompany=exact.name;input.dataset.selectedExchange=exact.exchange;input.dataset.selectedIsin=exact.isin||''}
+      else{delete input.dataset.selectedCompany;delete input.dataset.selectedExchange;delete input.dataset.selectedIsin}
+      updateResults(raw);
+      loadStocks().then(x=>{catalog=x;updateResults(input.value)}).catch(()=>{});
+    });
+    input.addEventListener('focus',()=>{
+      updateResults(input.value);
+      loadStocks().then(x=>{catalog=x;updateResults(input.value)}).catch(()=>{});
+    });
     document.addEventListener('click',e=>{if(!field.contains(e.target))box.style.display='none'});
   }
   async function saveSameDayTrade(){
