@@ -52,6 +52,14 @@ service cloud.firestore {
     match /users/{userId}/charges/{documentId} {
       allow read, write: if activeOwner(userId) || isAdmin();
     }
+
+    // Mutual fund / silver-fund booked profits remain private to the owner or an administrator.
+    match /users/{userId}/fundProfits/{documentId} {
+      allow read, write: if activeOwner(userId) || isAdmin();
+    }
+    match /{path=**}/fundProfits/{documentId} {
+      allow read, write: if isAdmin();
+    }
     match /{path=**}/charges/{documentId} {
       allow read, write: if isAdmin();
     }
