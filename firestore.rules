@@ -50,9 +50,32 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Each user's trades remain private. Admins can read/manage them.
+    // Each user's trades remain private. Normal users can only save
+    // mathematically consistent, reasonably bounded trade values.
+    function validTrade() {
+      return request.resource.data.keys().hasAll([
+        'ticker','quantity','avgBuy','sellPrice','buyDate','sellDate','cost','sale'
+      ])
+      && request.resource.data.quantity is number
+      && request.resource.data.avgBuy is number
+      && request.resource.data.sellPrice is number
+      && request.resource.data.cost is number
+      && request.resource.data.sale is number
+      && request.resource.data.quantity > 0
+      && request.resource.data.avgBuy > 0
+      && request.resource.data.sellPrice >= 0
+      && request.resource.data.cost >= 0
+      && request.resource.data.sale >= 0
+      && request.resource.data.cost <= 10000000000
+      && request.resource.data.sale <= 10000000000
+      && request.resource.data.cost == request.resource.data.quantity * request.resource.data.avgBuy
+      && request.resource.data.sale == request.resource.data.quantity * request.resource.data.sellPrice;
+    }
+
     match /users/{userId}/trades/{tradeId} {
-      allow read, write: if owner(userId) || isAdmin();
+      allow read: if owner(userId) || isAdmin();
+      allow create, update: if isAdmin() || (owner(userId) && validTrade());
+      allow delete: if owner(userId) || isAdmin();
     }
     match /{path=**}/trades/{tradeId} {
       allow read, write: if isAdmin();
