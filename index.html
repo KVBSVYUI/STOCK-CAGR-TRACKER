@@ -36,8 +36,8 @@ const fmt=d=>d?new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit'
 const STOCK_LOGO_BASE='https://dharunashokkumar.github.io/indian-listed-company-logos/';
 const initials=s=>String(s||'?').replace(/[^A-Z0-9]/gi,'').slice(0,2).toUpperCase()||'?';
 const normalTicker=s=>String(s||'').trim().toUpperCase().replace(/\s+/g,'');
-const logoUrl=(ticker,exchange='NSE')=>{const x=normalTicker(ticker);if(!x)return '';const ex=String(exchange||'NSE').toUpperCase();return STOCK_LOGO_BASE+(ex==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(x)+'.svg'};
-function logoHtml(t){const ticker=t.ticker||t.stock||'';const u=t.logoUrl||logoUrl(ticker,t.exchange);const fallback=esc(initials(ticker));return u?('<img src="'+esc(u)+'" onerror="this.remove();this.parentElement.textContent=\''+fallback+'\'">'):fallback}
+const logoUrl=(ticker,exchange='NSE')=>{const x=normalTicker(ticker);if(!x)return '';if(x==='MONEYVIEW')return 'https://www.google.com/s2/favicons?domain=moneyview.in&sz=128';const ex=String(exchange||'NSE').toUpperCase();return STOCK_LOGO_BASE+(ex==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(x)+'.svg'};
+function logoHtml(t){const ticker=normalTicker(t.ticker||t.stock||'');const u=t.logoUrl||logoUrl(ticker,t.exchange);const fallback=esc(initials(ticker));const retry=logoUrl(ticker,t.exchange);return u?('<img src="'+esc(u)+'" onerror="if(this.dataset.retry){this.remove();this.parentElement.textContent=\''+fallback+'\'}else{this.dataset.retry=\'1\';this.src=\''+esc(retry)+'\'}">'):fallback}
 function days(a,b){return Math.max(0,(new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000)}
 function authId(u){return String(u||'').trim().toLowerCase()+'@bookedprofittracker.app'}
 function validUsername(u){return /^[a-zA-Z0-9_]{3,24}$/.test(u)}
