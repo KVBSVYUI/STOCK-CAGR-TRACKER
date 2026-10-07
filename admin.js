@@ -1,5 +1,28 @@
-(function(){
-  const APP='https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
+  async function adminDashboard(){
+    // Recover the Firebase session if the menu is opened during the auth bootstrap race.
+    if(!current){
+      try{
+        const [a,am,fs]=await loadFirebase();
+        const apps=a.getApps();
+        if(!apps[0])throw new Error('Firebase app is not ready yet.');
+        const app=apps[0];
+        const auth=am.getAuth(app);
+        const user=auth.currentUser;
+        if(!user)throw new Error('Please sign in again.');
+        current={a,am,fs,app,auth,user};
+        const ownerByAuth=
+          String(user.email||'').toLowerCase()===OWNER_EMAIL ||
+          String(user.displayName||'').toLowerCase()===OWNER_USERNAME;
+        isAdmin=ownerByAuth;
+        window.__bptAdminUid=user.uid;
+        window.__bptIsAdmin=isAdmin;
+      }catch(e){
+        alert(e.message||'Admin session is still loading. Please open Admin again.');
+        return;
+      }
+    }
+
+    const b=modal(m/firebasejs/12.2.1/firebase-app.js';
   const AUTH='https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
   const FS='https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
   const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]));
