@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
 <meta name="description" content="Booked Profit Tracker — clean realized stock profit tracking with live cloud sync.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -44,7 +44,7 @@
 <script src="app-config.js"></script>
 <style>
 /* S23 Ultra / touch-device mobile layout: prevent desktop 980px canvas from being scaled down */
-@media (pointer: coarse) and (max-width: 1000px){
+@media screen and (max-width: 1000px){
   .app{width:100%;max-width:none;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(54px + env(safe-area-inset-bottom,0px))}
   .top{margin-bottom:16px}
   .brand h1{font-size:20px}
@@ -74,6 +74,15 @@
   .trade-result .profit{font-size:14px}
   .return{font-size:10px}
   .delete{font-size:18px}
+}
+</style><style>
+/* Force true phone sizing even when Android exposes a wide virtual viewport */
+@media screen and (max-width:1000px){
+  html,body{width:100%;min-width:0;overflow-x:hidden}
+  .app{width:100vw;max-width:none;margin:0;padding-left:16px;padding-right:16px}
+  .hero{width:100%}
+  .kpis{width:100%}
+  .card{width:100%}
 }
 </style></head>
 <body><div id="root"></div>
