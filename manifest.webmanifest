@@ -2,7 +2,7 @@
   "name": "Booked Profit Tracker",
   "short_name": "Profit Tracker",
   "id": "./",
-  "start_url": "./?pwa=v40",
+  "start_url": "./?pwa=v41",
   "scope": "./",
   "display_override": ["standalone"],
   "display": "standalone",
