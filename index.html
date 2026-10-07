@@ -42,7 +42,40 @@
 })();
 </script>
 <script src="app-config.js"></script>
-</head>
+<style>
+/* S23 Ultra / touch-device mobile layout: prevent desktop 980px canvas from being scaled down */
+@media (pointer: coarse) and (max-width: 1000px){
+  .app{width:100%;max-width:none;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(54px + env(safe-area-inset-bottom,0px))}
+  .top{margin-bottom:16px}
+  .brand h1{font-size:20px}
+  .brand p{font-size:11px}
+  .mark{width:42px;height:42px}
+  .hero{padding:22px;border-radius:20px}
+  .eyebrow{font-size:11px}
+  .profit{font-size:40px}
+  .hero-sub{font-size:11px}
+  .year{font-size:12px;padding:10px 12px}
+  .kpis{gap:8px}
+  .kpi{padding:13px}
+  .kpi .label{font-size:10px}
+  .kpi .value{font-size:17px}
+  .kpi .hint{font-size:9px}
+  .actions{gap:8px}
+  .primary,.secondary{font-size:13px;padding:11px 14px}
+  .section-head{padding:17px 16px 12px}
+  .title{font-size:16px}
+  .sub{font-size:10px}
+  .trades{padding:0 10px 12px}
+  .trade{grid-template-columns:46px minmax(0,1fr) auto 28px;gap:10px;padding:15px 5px}
+  .trade .stat{display:none}
+  .logo{width:42px;height:42px}
+  .trade-main b{font-size:14px}
+  .trade-main span{font-size:9px}
+  .trade-result .profit{font-size:14px}
+  .return{font-size:10px}
+  .delete{font-size:18px}
+}
+</style></head>
 <body><div id="root"></div>
 <script>
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{})}
