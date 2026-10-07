@@ -244,7 +244,7 @@ window.addEventListener('unhandledrejection',function(e){
   var phone=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||window.matchMedia('(display-mode: standalone)').matches||w<=600||((window.screen&&window.screen.width<=600));
   document.documentElement.classList.toggle('bpt-phone',phone); document.body.classList.toggle('bpt-phone',phone);
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js?v=43',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=44',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
   }
 })();
 </script>
