@@ -8,19 +8,9 @@ import('./admin.js').catch(()=>{});
   const FIREBASE_FIRESTORE='https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
   const getAuth=async()=>{const [a,m]=await Promise.all([import(FIREBASE_APP),import(FIREBASE_AUTH)]);return m.getAuth(a.getApps()[0])};
   const STOCK_BASE='https://dharunashokkumar.github.io/indian-listed-company-logos/';
-  const stockLogoUrl=x=>String(x?.ticker||'').toUpperCase()==='MONEYVIEW'?'https://www.google.com/s2/favicons?domain=moneyview.in&sz=128':STOCK_BASE+(String(x?.exchange||'NSE').toUpperCase()==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(String(x?.ticker||'').toUpperCase())+'.svg';
-  const IPO_CATALOG=[
-    {ticker:'MONEYVIEW',name:'Moneyview Financial Services Ltd',exchange:'NSE'},
-    {ticker:'ORIENTCABLES',name:'Orient Cables (India) Ltd',exchange:'NSE'},
-    {ticker:'SRIT',name:'SRIT India Ltd',exchange:'NSE'},
-    {ticker:'BENCHMARK',name:'Bench Mark Infotech Services Ltd',exchange:'NSE'},
-    {ticker:'SHAH',name:'Shah Investor’s Home Ltd',exchange:'NSE'},
-    {ticker:'ACMEINDIA',name:'Acme India Industries Ltd',exchange:'BSE'},
-    {ticker:'PARAMOUNTSYNTEX',name:'Paramount Syntex Ltd',exchange:'BSE'},
-    {ticker:'OMARA',name:'Omara Ventures India Ltd',exchange:'BSE'},
-    {ticker:'EVENTIONS',name:'Eventions Ltd',exchange:'NSE'},
-    {ticker:'VANSELECTRO',name:'Vans Electroengineerings Ltd',exchange:'BSE'}
-  ];
+  const LOCAL_CATALOG='stock-catalog.json';
+  const LIVE_CATALOG='https://bharatgraph.byvaibhav.com/api/company';
+  const stockLogoUrl=x=>x?.isin?'https://company-logo.shareperks.in/logo/'+encodeURIComponent(String(x.isin).toUpperCase())+'/icon.svg':STOCK_BASE+(String(x?.exchange||'NSE').toUpperCase()==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(String(x?.ticker||'').toUpperCase())+'.svg';
   let stockCatalogPromise=null;
   let done=false;
   function account(){
@@ -42,11 +32,19 @@ import('./admin.js').catch(()=>{});
     document.getElementById('bptMenuMailbox').onclick=()=>alert('Mailbox will be connected after the click issue is fully fixed.');
     d.onclick=e=>{if(e.target===d)d.remove()};
   }
+  function normalizeCatalog(data){
+    const rows=Array.isArray(data)?data:(Array.isArray(data?.records)?data.records:(Array.isArray(data?.data)?data.data:(Array.isArray(data?.companies)?data.companies:[])));
+    return rows.map(x=>({ticker:String(x.ticker||x.nse||x.NSE_symbol||x.symbol||x.bse||x.BSE_symbol||'').toUpperCase(),name:String(x.name||x.company||x.companyName||x.Company_Name||'').trim(),exchange:String(x.exchange||((x.nse||x.NSE_symbol)?'NSE':'BSE')).toUpperCase(),isin:String(x.isin||x.ISIN||'').toUpperCase()})).filter(x=>x.ticker&&x.name&&x.exchange).filter(x=>!x.name.toUpperCase().includes('MUTUAL FUND'));
+  }
   function loadStocks(){
     if(stockCatalogPromise)return stockCatalogPromise;
-    stockCatalogPromise=fetch(STOCK_BASE+'data/logos.json',{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error('stock list unavailable');return r.json()}).then(data=>{
-      const seen=new Set();
-      return [...IPO_CATALOG,...(data.logos||[])].map(x=>({ticker:String(x.ticker||'').toUpperCase(),name:String(x.company||x.name||x.ticker||''),exchange:String(x.exchange||'NSE').toUpperCase()})).filter(x=>x.ticker&&x.name).filter(x=>{const key=x.exchange+'|'+x.ticker;if(seen.has(key))return false;seen.add(key);return true});
+    stockCatalogPromise=Promise.allSettled([
+      fetch(LOCAL_CATALOG,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('local catalog unavailable');return r.json()}).then(normalizeCatalog),
+      fetch(LIVE_CATALOG,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('live catalog unavailable');return r.json()}).then(normalizeCatalog)
+    ]).then(results=>{
+      const seen=new Set(),all=[];
+      for(const result of results){if(result.status!=='fulfilled')continue;for(const x of result.value){const k=x.exchange+'|'+x.ticker;if(!seen.has(k)){seen.add(k);all.push(x)}}}
+      return all;
     }).catch(()=>[]);
     return stockCatalogPromise;
   }
@@ -59,7 +57,7 @@ import('./admin.js').catch(()=>{});
     const box=document.createElement('div');box.style.cssText='position:absolute;left:0;right:0;top:100%;margin-top:5px;background:#0b1421;border:1px solid #2a3a51;border-radius:12px;box-shadow:0 20px 45px #000b;z-index:1000;display:none;overflow:hidden;max-height:280px;overflow-y:auto';field.appendChild(box);
     const clean=s=>String(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]));
     let catalog=[];
-    const render=items=>{box.innerHTML=items.slice(0,8).map((x,i)=>`<button type="button" data-stock-index="${i}" style="display:flex;width:100%;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid #202b3b;background:#0b1421;color:#f4f7fb;cursor:pointer"><span style="width:32px;height:32px;border-radius:8px;background:#172438;display:grid;place-items:center;overflow:hidden;flex:none;font-size:9px;font-weight:800"><img src="${stockLogoUrl(x)}" style="width:100%;height:100%;object-fit:contain;background:#fff" onerror="this.style.display='none';this.parentElement.textContent='${clean(x.ticker).slice(0,2)}'"></span><span style="min-width:0"><b style="display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${clean(x.name)}</b><small style="display:block;color:#8997aa;margin-top:2px">${clean(x.ticker)} · ${clean(x.exchange)}</small></span></button>`).join('');box.style.display=items.length?'block':'none';box.querySelectorAll('[data-stock-index]').forEach(b=>b.onclick=()=>{const x=items[Number(b.dataset.stockIndex)];if(!x)return;input.value=x.ticker;input.dataset.selectedCompany=x.name;input.dataset.selectedExchange=x.exchange;box.style.display='none'})};
+    const render=items=>{box.innerHTML=items.slice(0,8).map((x,i)=>`<button type="button" data-stock-index="${i}" style="display:flex;width:100%;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid #202b3b;background:#0b1421;color:#f4f7fb;cursor:pointer"><span style="width:32px;height:32px;border-radius:8px;background:#172438;display:grid;place-items:center;overflow:hidden;flex:none;font-size:9px;font-weight:800"><img src="${stockLogoUrl(x)}" style="width:100%;height:100%;object-fit:contain;background:#fff" onerror="this.style.display='none';this.parentElement.textContent='${clean(x.ticker).slice(0,2)}'"></span><span style="min-width:0"><b style="display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${clean(x.name)}</b><small style="display:block;color:#8997aa;margin-top:2px">${clean(x.ticker)} · ${clean(x.exchange)}</small></span></button>`).join('');box.style.display=items.length?'block':'none';box.querySelectorAll('[data-stock-index]').forEach(b=>b.onclick=()=>{const x=items[Number(b.dataset.stockIndex)];if(!x)return;input.value=x.ticker;input.dataset.selectedCompany=x.name;input.dataset.selectedExchange=x.exchange;input.dataset.selectedIsin=x.isin||'';box.style.display='none'})};
     input.addEventListener('input',async()=>{const q=input.value.trim().toLowerCase();if(!q){box.style.display='none';return}catalog=await loadStocks();const matches=catalog.filter(x=>x.ticker.toLowerCase().startsWith(q)||x.name.toLowerCase().includes(q)).sort((a,b)=>{const score=x=>x.ticker.toLowerCase()===q?0:x.ticker.toLowerCase().startsWith(q)?1:x.name.toLowerCase().startsWith(q)?2:3;return score(a)-score(b)||a.name.localeCompare(b.name)});render(matches)});
     input.addEventListener('focus',()=>{if(input.value.trim())input.dispatchEvent(new Event('input'))});
     document.addEventListener('click',e=>{if(!field.contains(e.target))box.style.display='none'});
@@ -76,7 +74,7 @@ import('./admin.js').catch(()=>{});
       const user=a.currentUser;
       if(!user)return alert('Please sign in again.');
       const db=fs.getFirestore(appMod.getApps()[0]);
-      const companyName=document.getElementById('mTicker')?.dataset.selectedCompany||ticker;const exchange=document.getElementById('mTicker')?.dataset.selectedExchange||'NSE';await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,companyName,exchange,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:stockLogoUrl({ticker,exchange}),createdAt:fs.serverTimestamp()});
+      const companyName=document.getElementById('mTicker')?.dataset.selectedCompany||ticker;const exchange=document.getElementById('mTicker')?.dataset.selectedExchange||'NSE';const isin=document.getElementById('mTicker')?.dataset.selectedIsin||'';await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,companyName,exchange,isin,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:stockLogoUrl({ticker,exchange,isin}),createdAt:fs.serverTimestamp()});
       document.querySelector('.modal-back.open')?.remove();
     }catch(e){alert('Could not save trade: '+(e.code||'error'));}
     return true;
