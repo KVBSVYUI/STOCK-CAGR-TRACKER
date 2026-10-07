@@ -24,7 +24,8 @@ service cloud.firestore {
     }
 
     // Admin roles are deliberately not writable by the web app.
-    // The owner enables the first admin manually in Firebase Console by creating:
+    // The built-in owner is the reserved username/email "mohitx12".
+    // Additional admins can be enabled manually in Firebase Console by creating:
     // /admins/<ADMIN_UID>  { admin: true }
     match /admins/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
