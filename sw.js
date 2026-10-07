@@ -1,7 +1,43 @@
-const CACHE='booked-profit-tracker-final-v26';
+const CACHE='booked-profit-tracker-final-v27';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./app-config.js','./stock-catalog.json','./admin.js'];
-const ADMIN_FIX="async function setupMenu(){if(booted)return;booted=true;try{const st=await ensureProfile();if(!st?.user)return;";
-const ADMIN_FIXED="async function setupMenu(){if(booted)return;try{const [a,am]=await Promise.all([import(APP),import(AUTH)]);const app=a.getApps()[0],auth=am.getAuth(app);const u=await new Promise(resolve=>{const off=am.onAuthStateChanged(auth,user=>{off();resolve(user)})});if(!u)return;booted=true;const st=await ensureProfile();if(!st?.user)return;";
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(async r=>{if(new URL(e.request.url).pathname.endsWith('/admin.js')){const text=await r.clone().text();const fixed=text.replace(ADMIN_FIX,ADMIN_FIXED);r=new Response(fixed,{status:r.status,statusText:r.statusText,headers:r.headers})}const copy=r.clone();caches.open(CACHE).then(x=>x.put(e.request,copy));return r}).catch(()=>caches.match('./'))) });
+
+self.addEventListener('install',event=>{
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    await cache.addAll(ASSETS);
+    await self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch',event=>{
+  if(event.request.method!=='GET')return;
+  const url=new URL(event.request.url);
+  const local=url.origin===self.location.origin;
+  const appFile=local && ['/','/index.html','/app-config.js','/stock-catalog.json','/admin.js','/manifest.webmanifest'].includes(url.pathname);
+  if(appFile){
+    event.respondWith((async()=>{
+      try{
+        const fresh=await fetch(event.request,{cache:'no-store'});
+        const cache=await caches.open(CACHE);
+        await cache.put(event.request,fresh.clone());
+        return fresh;
+      }catch(e){
+        return caches.match(event.request)||caches.match('./');
+      }
+    })());
+    return;
+  }
+  event.respondWith((async()=>{
+    const cached=await caches.match(event.request);
+    if(cached)return cached;
+    try{return await fetch(event.request)}catch(e){return caches.match('./')}
+  })());
+});
