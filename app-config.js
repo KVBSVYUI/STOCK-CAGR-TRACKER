@@ -11,6 +11,7 @@ import('./admin.js').catch(()=>{});
   const LOCAL_CATALOG='stock-catalog.json';
   const LIVE_CATALOG='https://bharatgraph.byvaibhav.com/api/company';
   const SPECIAL_LOGO_DOMAINS={VOGL:'vedantaoilandgas.com',SHIPROCKET:'shiprocket.in',BLEL:'beharilalengineering.com',SUNSHINE:'sunshinepictures.in'};
+  const KNOWN_STOCK_NAMES={SUNSHINE:'Sunshine Pictures Limited',VOGL:'Vedanta Oil and Gas Limited',SHIPROCKET:'Shiprocket Limited',BLEL:'Behari Lal Engineering Limited'};
   const stockLogoUrl=x=>{const t=String(x?.ticker||'').toUpperCase();if(SPECIAL_LOGO_DOMAINS[t])return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(SPECIAL_LOGO_DOMAINS[t])+'&sz=128';return x?.isin?'https://company-logo.shareperks.in/logo/'+encodeURIComponent(String(x.isin).toUpperCase())+'/icon.svg':STOCK_BASE+(String(x?.exchange||'NSE').toUpperCase()==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(t)+'.svg'};
   let stockCatalogPromise=null;
   let done=false;
@@ -75,7 +76,7 @@ import('./admin.js').catch(()=>{});
       const user=a.currentUser;
       if(!user)return alert('Please sign in again.');
       const db=fs.getFirestore(appMod.getApps()[0]);
-      const companyName=document.getElementById('mTicker')?.dataset.selectedCompany||ticker;const exchange=document.getElementById('mTicker')?.dataset.selectedExchange||'NSE';const isin=document.getElementById('mTicker')?.dataset.selectedIsin||'';await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,companyName,exchange,isin,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:stockLogoUrl({ticker,exchange,isin}),createdAt:fs.serverTimestamp()});
+      const companyName=KNOWN_STOCK_NAMES[ticker]||document.getElementById('mTicker')?.dataset.selectedCompany||ticker;const exchange=document.getElementById('mTicker')?.dataset.selectedExchange||'NSE';const isin=document.getElementById('mTicker')?.dataset.selectedIsin||'';await fs.addDoc(fs.collection(db,'users',user.uid,'trades'),{ticker,stock:ticker,companyName,exchange,isin,quantity:q,avgBuy:b,sellPrice:s,buyDate:bd,sellDate:sd,cost:q*b,sale:q*s,logoUrl:stockLogoUrl({ticker,exchange,isin}),createdAt:fs.serverTimestamp()});
       document.querySelector('.modal-back.open')?.remove();
     }catch(e){alert('Could not save trade: '+(e.code||'error'));}
     return true;
