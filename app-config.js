@@ -31,7 +31,7 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
     document.getElementById('bptMenuClose').onclick=()=>d.remove();
     document.getElementById('bptMenuAccount').onclick=account;
     document.getElementById('bptMenuMailbox').onclick=()=>alert('Mailbox will be connected after the click issue is fully fixed.');
-    document.getElementById('bptMenuFunds').onclick=()=>{d.remove();if(window.BPT_FUND_PROFIT_MODAL){window.BPT_FUND_PROFIT_MODAL();return}const b=document.getElementById('addFundOpen');if(b)b.click()};
+    document.getElementById('bptMenuFunds').onclick=()=>{d.remove();if(window.BPT_FUND_MANAGER_MODAL){window.BPT_FUND_MANAGER_MODAL();return}if(window.BPT_FUND_PROFIT_MODAL)window.BPT_FUND_PROFIT_MODAL()};
     const ad=document.getElementById('bptMenuAdmin');if(ad)ad.onclick=()=>window.BPT_ADMIN_DASHBOARD&&window.BPT_ADMIN_DASHBOARD();
     d.onclick=e=>{if(e.target===d)d.remove()};
   }
