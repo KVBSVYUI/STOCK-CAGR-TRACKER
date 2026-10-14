@@ -8,9 +8,9 @@ window.APP_CONFIG={firebase:{apiKey:"AIzaSyAokMEP3H618OgHAMLSoQcbFVE_DtPAiig",au
   const STOCK_BASE='https://dharunashokkumar.github.io/indian-listed-company-logos/';
   const LOCAL_CATALOG='stock-catalog.json?v=25';
   const LIVE_CATALOG='https://bharatgraph.byvaibhav.com/api/company';
-  const SPECIAL_LOGO_DOMAINS={VOGL:'vedantaoilandgas.com',SHIPROCKET:'shiprocket.in',BLEL:'beharilalengineering.com',SUNSHINE:'sunshinepictures.in'};
+  const SPECIAL_LOGO_DOMAINS={VOGL:'vedantaoilandgas.com',SHIPROCKET:'shiprocket.in',BLEL:'beharilalengineering.com',SUNSHINE:'sunshinepictures.in',CCAVENUE:'avenuesai.com',FCL:'fineotex.com'};
   const KNOWN_STOCK_NAMES={SUNSHINE:'Sunshine Pictures Limited',VOGL:'Vedanta Oil and Gas Limited',SHIPROCKET:'Shiprocket Limited',BLEL:'Behari Lal Engineering Limited'};
-  const stockLogoUrl=x=>{const t=String(x?.ticker||'').toUpperCase();if(SPECIAL_LOGO_DOMAINS[t])return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(SPECIAL_LOGO_DOMAINS[t])+'&sz=128';return x?.isin?'https://company-logo.shareperks.in/logo/'+encodeURIComponent(String(x.isin).toUpperCase())+'/icon.svg':STOCK_BASE+(String(x?.exchange||'NSE').toUpperCase()==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(t)+'.svg'};
+  const stockLogoUrl=x=>{const t=String(x?.ticker||'').toUpperCase();if(t==='MCLOUD')return '';if(SPECIAL_LOGO_DOMAINS[t])return 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(SPECIAL_LOGO_DOMAINS[t])+'&sz=128';return x?.isin?'https://company-logo.shareperks.in/logo/'+encodeURIComponent(String(x.isin).toUpperCase())+'/icon.svg':STOCK_BASE+(String(x?.exchange||'NSE').toUpperCase()==='BSE'?'bse/BSE_':'nse/NSE_')+encodeURIComponent(t)+'.svg'};
   let stockCatalogPromise=null;
   let done=false;
   function account(){
