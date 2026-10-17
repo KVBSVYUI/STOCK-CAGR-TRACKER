@@ -109,3 +109,31 @@ input,select,textarea{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+
+/* Final cascade pass: keep this layer last; presentation only. */
+html,body{background-color:#080d15!important}
+body{background-image:radial-gradient(900px 500px at 0% 0%,#17283d 0%,transparent 65%),linear-gradient(180deg,#080d15 0%,#0a111b 100%)!important}
+.app{width:100%!important;max-width:1040px!important;margin-inline:auto!important}
+.top{align-items:center!important}
+.hero{background:linear-gradient(145deg,#142337 0%,#0e1724 68%,#0c131e 100%)!important;border:1px solid #2b3c52!important;border-radius:26px!important;box-shadow:0 16px 42px #0003,inset 0 1px #ffffff0a!important}
+.kpi,.card{background:linear-gradient(155deg,#111b29 0%,#0d141f 100%)!important;border:1px solid #263548!important;box-shadow:0 10px 30px #0002,inset 0 1px #ffffff06!important}
+.kpi{border-radius:18px!important}
+.card{border-radius:23px!important}
+.primary{background:linear-gradient(110deg,#5ce6ad,#2ecb91)!important;color:#062218!important;border:1px solid #6af0b8!important;font-weight:750!important;box-shadow:0 8px 22px #2ecb911c!important}
+.secondary,.icon,.year,.trade-sort,.mini-btn{background:#111b29!important;border-color:#2b3b50!important}
+.secondary,.year,.trade-sort{border-radius:14px!important}
+.icon{border-radius:15px!important}
+.title{letter-spacing:-.025em!important}
+.profit,.kpi .value,.stat .v,.trade-result .profit{font-variant-numeric:tabular-nums lining-nums!important}
+.field input,.field select,.field textarea{background:#0a121d!important;border:1px solid #2b3b50!important;border-radius:13px!important}
+.modal,.auth-card{background:linear-gradient(150deg,#142033,#0b121c)!important;border:1px solid #304158!important;border-radius:24px!important}
+@media(max-width:600px){
+ .app{padding-left:15px!important;padding-right:15px!important}
+ .hero{padding:21px!important;border-radius:24px!important}
+ .kpis{gap:9px!important}
+ .kpi{padding:13px 11px!important}
+ .card{border-radius:21px!important}
+ .section-head{padding:18px 17px 12px!important}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
