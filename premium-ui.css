@@ -360,3 +360,26 @@ select,.year,.trade-sort{cursor:pointer!important}
 .section-head-right .bpt-select{min-width:142px;max-width:160px}
 @media(max-width:600px){.bpt-select-trigger{min-height:43px;font-size:12px}.bpt-select-menu{max-width:calc(100vw - 36px);max-height:40dvh}.year-filters .bpt-select{min-width:132px}.section-head-right .bpt-select{min-width:142px;max-width:160px}}
 @media(prefers-reduced-motion:reduce){.bpt-select-trigger,.bpt-select-chevron,.bpt-select-menu{transition:none!important}}
+
+
+/* Hotfix: keep custom dropdown above trade rows on mobile stacking contexts. */
+.bpt-select{z-index:1}
+.bpt-select.is-open{z-index:9999!important}
+.bpt-select-menu{
+  z-index:10000!important;
+  background:#101b29!important;
+  background-image:none!important;
+  opacity:1;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 22px 48px #000e,0 0 0 1px #26394e;
+  isolation:isolate;
+}
+.bpt-select-option{background-color:#101b29}
+.bpt-select-option:hover{background-color:#1a2a3b!important}
+.bpt-select-option.is-selected{background:#15362d!important}
+.section-head-right,.section-head{overflow:visible}
+@media(max-width:600px){
+  .bpt-select.is-open{z-index:9999!important}
+  .bpt-select-menu{max-height:min(280px,38dvh)!important}
+}
