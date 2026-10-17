@@ -215,3 +215,15 @@ body{background-image:radial-gradient(900px 500px at 0% 0%,#17283d 0%,transparen
  .trade-result .return{font-size:9px!important;white-space:normal!important}
  .delete{font-size:18px!important;width:22px!important}
 }
+
+
+/* Mobile dashboard balance refinement: reduce empty space in the profit hero. */
+@media(max-width:600px){
+ .hero{min-height:0!important;padding:20px 18px!important}
+ .hero-top{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:start!important;gap:0!important}
+ .hero-top>div:first-child{min-width:0!important}
+ .profit-breakdown{display:flex!important;flex-wrap:wrap!important;gap:7px!important;margin-top:11px!important}
+ .year-filters{position:static!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;margin:14px 0 0!important;padding:0!important;align-self:start!important}
+ .year{margin:0!important;min-height:42px!important;padding:10px 13px!important}
+ .hero-sub{margin-top:6px!important}
+}
