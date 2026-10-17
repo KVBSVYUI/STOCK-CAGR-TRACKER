@@ -340,3 +340,23 @@ select,.year,.trade-sort{cursor:pointer!important}
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+
+/* Custom select surfaces: consistent dark menus instead of Android's native sheet. */
+.bpt-select{position:relative;display:inline-flex;vertical-align:middle;min-width:0;isolation:isolate}
+.bpt-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:18px;width:100%;min-height:44px;padding:11px 13px;border:1px solid #2b3b50;border-radius:14px;background:linear-gradient(145deg,#131e2d,#0d1623);color:#f0f5fc;font-size:12px;font-weight:750;text-align:left;box-shadow:inset 0 1px #ffffff06;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}
+.bpt-select-trigger:hover,.bpt-select.is-open .bpt-select-trigger{border-color:#3e806e;background:#142235}
+.bpt-select-trigger:focus-visible{outline:2px solid #55dca9;outline-offset:3px}
+.bpt-select-chevron{font-size:17px;line-height:1;color:#9bacc0;transform:translateY(-2px);transition:transform .18s ease}
+.bpt-select.is-open .bpt-select-chevron{transform:rotate(180deg) translateY(-1px)}
+.bpt-native-select{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;pointer-events:none!important;z-index:-1!important}
+.bpt-select-menu{position:absolute;z-index:100;top:calc(100% + 8px);right:0;min-width:100%;width:max-content;max-width:min(290px,calc(100vw - 40px));max-height:min(300px,45dvh);overflow:auto;padding:5px;border:1px solid #2a3b50;border-radius:17px;background:linear-gradient(155deg,#172437,#0d1623);box-shadow:0 20px 50px #000b,inset 0 1px #ffffff0a;opacity:0;visibility:hidden;transform:translateY(-5px) scale(.985);transform-origin:top right;transition:opacity .15s ease,transform .15s ease,visibility .15s ease}
+.bpt-select.is-open .bpt-select-menu{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.bpt-select-option{display:flex;align-items:center;justify-content:space-between;gap:22px;width:100%;min-height:43px;padding:11px 12px;border:0;border-radius:11px;background:transparent;color:#c6d2e2;text-align:left;font-size:12px;font-weight:650;white-space:nowrap}
+.bpt-select-option:hover{background:#ffffff08;color:#f5f8fd}
+.bpt-select-option.is-selected{background:linear-gradient(90deg,#16372f,#132b2b);color:#7be7b8}
+.bpt-option-check{min-width:14px;color:#6de3b0;font-size:14px;font-weight:900;text-align:right}
+.year-filters .bpt-select{min-width:132px}
+.section-head-right .bpt-select{min-width:142px;max-width:160px}
+@media(max-width:600px){.bpt-select-trigger{min-height:43px;font-size:12px}.bpt-select-menu{max-width:calc(100vw - 36px);max-height:40dvh}.year-filters .bpt-select{min-width:132px}.section-head-right .bpt-select{min-width:142px;max-width:160px}}
+@media(prefers-reduced-motion:reduce){.bpt-select-trigger,.bpt-select-chevron,.bpt-select-menu{transition:none!important}}
