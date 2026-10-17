@@ -1,0 +1,16 @@
+(function(){'use strict';
+const ids=['year','tradeSort'];
+function enhance(s){if(!s||s.dataset.bptCustom==='1')return;s.dataset.bptCustom='1';
+const w=document.createElement('div');w.className='bpt-select';const b=document.createElement('button');b.type='button';b.className='bpt-select-trigger';b.setAttribute('aria-haspopup','listbox');b.setAttribute('aria-expanded','false');b.setAttribute('aria-label',s.getAttribute('aria-label')||(s.id==='year'?'Choose year':'Sort sold shares'));
+const l=document.createElement('span'),ch=document.createElement('span');l.className='bpt-select-label';ch.className='bpt-select-chevron';ch.setAttribute('aria-hidden','true');ch.textContent='⌄';b.append(l,ch);
+const m=document.createElement('div');m.className='bpt-select-menu';m.setAttribute('role','listbox');m.id='bpt-options-'+s.id;b.setAttribute('aria-controls',m.id);w.append(b,m);s.parentNode.insertBefore(w,s);w.append(s);s.classList.add('bpt-native-select');
+function close(){w.classList.remove('is-open');b.setAttribute('aria-expanded','false')}
+function refresh(){const o=s.options[s.selectedIndex];l.textContent=o?o.textContent.trim():'';m.replaceChildren();Array.from(s.options).forEach(opt=>{const it=document.createElement('button');it.type='button';it.className='bpt-select-option'+(opt.selected?' is-selected':'');it.setAttribute('role','option');it.setAttribute('aria-selected',String(opt.selected));it.disabled=opt.disabled;const tx=document.createElement('span'),ck=document.createElement('span');tx.textContent=opt.textContent.trim();ck.className='bpt-option-check';ck.textContent=opt.selected?'✓':'';ck.setAttribute('aria-hidden','true');it.append(tx,ck);it.addEventListener('click',()=>{if(s.value!==opt.value){s.value=opt.value;s.dispatchEvent(new Event('change',{bubbles:true}))}refresh();close();b.focus({preventScroll:true})});m.append(it)})}
+b.addEventListener('click',()=>{const open=!w.classList.contains('is-open');document.querySelectorAll('.bpt-select.is-open').forEach(x=>{x.classList.remove('is-open');x.querySelector('.bpt-select-trigger')?.setAttribute('aria-expanded','false')});if(open){w.classList.add('is-open');b.setAttribute('aria-expanded','true');m.querySelector('.is-selected')?.scrollIntoView({block:'nearest'})}else close()});
+s.addEventListener('change',refresh);new MutationObserver(refresh).observe(s,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['selected','disabled']});refresh()}
+function scan(){ids.forEach(id=>enhance(document.getElementById(id)))}
+document.addEventListener('click',e=>{if(!e.target.closest('.bpt-select'))document.querySelectorAll('.bpt-select.is-open').forEach(w=>{w.classList.remove('is-open');w.querySelector('.bpt-select-trigger')?.setAttribute('aria-expanded','false')})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.bpt-select.is-open').forEach(w=>{w.classList.remove('is-open');w.querySelector('.bpt-select-trigger')?.setAttribute('aria-expanded','false');w.querySelector('.bpt-select-trigger')?.focus({preventScroll:true})})});
+function start(){scan();new MutationObserver(scan).observe(document.body,{childList:true,subtree:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start()
+})();
