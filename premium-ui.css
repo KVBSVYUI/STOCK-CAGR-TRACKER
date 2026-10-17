@@ -290,3 +290,53 @@ select,.year,.trade-sort{cursor:pointer!important}
  button{transition:none!important}
  button:active{transform:none!important}
 }
+
+
+/* Refinement pass 3: forms, modal sheets, settings and touch feedback. */
+.modal-back{backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;background:#02060bb8!important;padding:14px!important}
+.modal{background:linear-gradient(155deg,#142033 0%,#0d1623 72%)!important;border-color:#2a3a4e!important;border-radius:25px!important;box-shadow:0 28px 90px #0009,inset 0 1px #ffffff0a!important;padding:22px!important}
+.modal h3{font-size:20px!important;font-weight:780!important;letter-spacing:-.04em!important}
+.modal p{line-height:1.6!important}
+.close{width:36px!important;height:36px!important;display:inline-grid!important;place-items:center!important;border-radius:12px!important;float:right!important;transition:background .16s ease,color .16s ease!important}
+.close:hover{background:#ffffff0c!important;color:#edf5ff!important}
+.modal-grid{gap:12px!important}
+.field input,.field select,.field textarea,input,textarea{border-radius:13px}
+.field input,.field select,.field textarea{min-height:44px!important;background:#09121e!important;border:1px solid #2a394d!important;color:#eef4fc!important;padding:11px 12px!important;transition:border-color .16s ease,box-shadow .16s ease!important}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#4ed9a5!important;box-shadow:0 0 0 3px #4ed9a51c!important;outline:none!important}
+.field input::placeholder,.field textarea::placeholder{color:#65758b!important}
+.field label{display:block!important;margin-bottom:7px!important}
+.modal-actions{gap:9px!important;padding-top:5px!important}
+.modal-actions .primary,.modal-actions .secondary{min-height:44px!important;border-radius:13px!important}
+.primary,.secondary,.mini-btn,.fund-delete,.account-action,.password-toggle{transition:transform .16s ease,background .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease!important}
+.primary:active,.secondary:active,.mini-btn:active,.account-action:active{transform:scale(.985)!important}
+.primary{font-weight:750!important}
+.secondary{border-color:#29384c!important;background:linear-gradient(145deg,#151f2e,#101927)!important}
+.secondary:hover{border-color:#3b526c!important;background:#182538!important}
+.mini-btn{border-radius:10px!important;padding:8px 10px!important}
+.mini-btn:hover{border-color:#4a627d!important;background:#172538!important}
+.account-profile{background:linear-gradient(140deg,#101d2d,#0a121e)!important;padding:15px!important}
+.account-section{background:#0a121e!important;border-color:#26364a!important}
+.account-section-title{padding:12px 14px!important;color:#8092a9!important}
+.account-action{padding:15px 14px!important}
+.account-action:hover{background:#ffffff06!important}
+.account-action b{font-size:13px!important;letter-spacing:-.01em!important}
+.account-action span{line-height:1.45!important}
+.account-signout{border-color:#51313b!important;color:#ff9ba5!important}
+.account-signout:hover{background:#351a25!important}
+.password-toggle{border-radius:10px!important}
+.trade-sort,.year{border:1px solid #2b3a4e!important;background-color:#111b29!important;color:#eef4fc!important;box-shadow:inset 0 1px #ffffff05!important}
+.trade-sort:focus,.year:focus{outline:2px solid #55dca9!important;outline-offset:2px!important}
+.delete,.fund-delete{transition:background .16s ease,color .16s ease,transform .16s ease!important}
+.delete:active,.fund-delete:active{transform:scale(.92)!important}
+@media(max-width:600px){
+ .modal-back{padding:9px!important}
+ .modal{width:100%!important;max-height:88dvh!important;border-radius:24px 24px 19px 19px!important;padding:19px!important}
+ .modal h3{font-size:19px!important}
+ .modal-grid{gap:10px!important}
+ .modal-actions{display:grid!important;grid-template-columns:1fr 1fr!important}
+ .modal-actions>*{width:100%!important}
+ .account-action{padding:14px 12px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
