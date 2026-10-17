@@ -137,3 +137,81 @@ body{background-image:radial-gradient(900px 500px at 0% 0%,#17283d 0%,transparen
  .section-head{padding:18px 17px 12px!important}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+
+
+/* Premium layout pass: visible hierarchy and composition; presentation only. */
+.app{max-width:980px!important}
+.top{min-height:74px!important;margin-bottom:24px!important}
+.brand h1{font-size:21px!important;line-height:1.12!important;letter-spacing:-.045em!important}
+.brand p{margin-top:5px!important;color:#8d9bb0!important}
+.hero{position:relative!important;overflow:hidden!important;min-height:218px!important;padding:30px!important;border-radius:28px!important;background:linear-gradient(120deg,#14243a 0%,#101c2b 52%,#0c1723 100%)!important}
+.hero:before{content:"";position:absolute;inset:0 0 auto auto;width:250px;height:250px;transform:translate(26%,-43%);border-radius:50%;background:radial-gradient(circle,#52e5aa22,transparent 68%);pointer-events:none}
+.hero-top{position:relative;z-index:1;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:22px!important}
+.eyebrow{font-size:10px!important;letter-spacing:.15em!important;line-height:1.5!important;color:#a7b8cd!important}
+.profit{font-size:clamp(38px,5.5vw,54px)!important;letter-spacing:-.055em!important;line-height:1.05!important;margin:12px 0 9px!important}
+.hero-sub{color:#94a3b8!important;font-size:12px!important}
+.profit-breakdown{margin-top:14px!important;gap:7px!important}
+.profit-chip{padding:8px 11px!important;border-radius:999px!important;background:#0a1421!important;border-color:#293c50!important;font-size:10px!important}
+.year-filters{flex-shrink:0!important}
+.year{min-width:128px!important;padding:12px 14px!important}
+.kpis{gap:12px!important;margin-top:14px!important}
+.kpi{min-height:105px!important;padding:18px!important;border-radius:19px!important}
+.kpi .label{font-size:9px!important;letter-spacing:.13em!important;color:#8e9eb3!important}
+.kpi .value{font-size:clamp(17px,2.3vw,23px)!important;letter-spacing:-.035em!important;margin-top:8px!important;line-height:1.15!important}
+.kpi .hint{margin-top:7px!important;color:#77879b!important;font-size:10px!important;line-height:1.35!important}
+.actions{gap:10px!important;margin:18px 0 20px!important}
+.actions .primary,.actions .secondary{min-height:48px!important;border-radius:15px!important;font-size:13px!important;letter-spacing:-.01em!important}
+.actions .primary{box-shadow:0 7px 22px #2fc98a1b!important}
+.card{border-radius:24px!important;margin-top:16px!important}
+.section-head{padding:22px 22px 16px!important;align-items:flex-start!important}
+.title{font-size:17px!important;font-weight:750!important;letter-spacing:-.035em!important}
+.sub{max-width:500px!important;margin-top:6px!important;color:#8c9bb0!important;font-size:11px!important;line-height:1.5!important}
+.charges-line{padding:10px 22px 16px!important;color:#8998ac!important;font-size:11px!important}
+.charges-line b{color:#eaf0f8!important;font-size:12px!important}
+.charge-list,.trades,.fund-list{padding-left:18px!important;padding-right:18px!important}
+.charge-row,.trade,.fund-row{border-top:1px solid #243247!important}
+.trade{grid-template-columns:54px minmax(0,1fr) minmax(90px,auto) 28px!important;gap:13px!important;padding:19px 5px!important}
+.trade .stat{display:none!important}
+.logo{width:54px!important;height:54px!important;border-radius:16px!important}
+.trade-main b{font-size:15px!important;line-height:1.25!important;letter-spacing:-.025em!important}
+.trade-main span{display:block!important;margin-top:5px!important;color:#8797ac!important;font-size:10px!important;line-height:1.45!important;white-space:normal!important}
+.trade-result{text-align:right!important}
+.trade-result .profit{font-size:15px!important;font-weight:780!important;letter-spacing:-.025em!important;line-height:1.2!important}
+.trade-result .return{font-size:10px!important;margin-top:5px!important}
+.delete{border-radius:10px!important;color:#71839b!important}
+.delete:hover{background:#ff718015!important;color:#ff8b98!important}
+.empty{border-top:1px solid #243247!important;color:#8494aa!important}
+.field label{margin-bottom:7px!important;color:#a7b5c8!important;font-size:11px!important}
+@media(max-width:600px){
+ .app{padding:15px 13px 54px!important}
+ .top{margin-bottom:19px!important;gap:10px!important}
+ .brand h1{font-size:18px!important}
+ .brand p{font-size:10px!important}
+ .hero{min-height:0!important;padding:22px 20px!important;border-radius:24px!important}
+ .hero-top{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:17px!important}
+ .profit{font-size:clamp(35px,9vw,44px)!important;letter-spacing:-.06em!important;margin-top:11px!important}
+ .hero-sub{font-size:11px!important}
+ .profit-breakdown{margin-top:12px!important}
+ .year-filters{display:flex!important;justify-content:flex-start!important}
+ .year{min-width:132px!important}
+ .kpis{gap:8px!important;margin-top:12px!important}
+ .kpi{min-height:94px!important;padding:13px 10px!important;border-radius:16px!important}
+ .kpi .label{font-size:8px!important;letter-spacing:.09em!important}
+ .kpi .value{font-size:clamp(13px,3.7vw,17px)!important;overflow-wrap:anywhere!important}
+ .kpi .hint{font-size:9px!important}
+ .actions{gap:8px!important;margin:14px 0 16px!important}
+ .actions .primary,.actions .secondary{min-height:46px!important;font-size:12px!important;padding:10px!important}
+ .card{border-radius:21px!important;margin-top:14px!important}
+ .section-head{padding:18px 16px 13px!important;gap:12px!important}
+ .title{font-size:16px!important}
+ .sub{font-size:10px!important}
+ .charges-line{padding:9px 16px 13px!important;gap:10px!important;font-size:10px!important}
+ .charge-list,.trades,.fund-list{padding-left:12px!important;padding-right:12px!important}
+ .trade{grid-template-columns:46px minmax(0,1fr) auto 22px!important;gap:9px!important;padding:15px 2px!important;min-height:0!important}
+ .logo{width:46px!important;height:46px!important;border-radius:13px!important}
+ .trade-main b{font-size:14px!important;line-height:1.2!important}
+ .trade-main span{font-size:9px!important;line-height:1.4!important}
+ .trade-result .profit{font-size:12px!important}
+ .trade-result .return{font-size:9px!important;white-space:normal!important}
+ .delete{font-size:18px!important;width:22px!important}
+}
