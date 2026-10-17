@@ -383,3 +383,13 @@ select,.year,.trade-sort{cursor:pointer!important}
   .bpt-select.is-open{z-index:9999!important}
   .bpt-select-menu{max-height:min(280px,38dvh)!important}
 }
+
+
+/* Year-filter fix: its menu was being clipped by the hero card's overflow. */
+.hero{overflow:visible!important}
+.hero:after{pointer-events:none;z-index:0}
+.hero-top{position:relative;z-index:1}
+.year-filters{position:relative;z-index:2}
+.year-filters .bpt-select{z-index:3}
+.year-filters .bpt-select.is-open{z-index:10001!important}
+.year-filters .bpt-select-menu{z-index:10002!important;max-height:min(300px,42dvh)!important}
