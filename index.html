@@ -43,6 +43,11 @@
     const drawer=document.querySelector('.app-drawer');
     const actions=drawer&&drawer.querySelector('aside > div');
     if(!actions)return;
+    // Remove only the obsolete duplicate menu item; keep the current Target button and its page logic.
+    actions.querySelectorAll('button,a,[role="button"]').forEach(item=>{
+      const label=(item.textContent||'').replace(/\s+/g,' ').trim();
+      if(/^🎯?\s*Target\s*[·•-]\s*₹\s*1\s*Cr$/i.test(label))item.remove();
+    });
     if(!document.getElementById('bptMenuTarget')){
       const target=document.createElement('button');
       target.id='bptMenuTarget';target.type='button';target.className='secondary';
