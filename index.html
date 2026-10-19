@@ -37,10 +37,9 @@
 @media (display-mode:standalone){body{padding-top:28px}.app{padding-top:18px}.auth{padding-top:18px}}@media(max-width:560px){.charge-row{grid-template-columns:1fr auto;gap:6px}.charge-amount{text-align:left}.charge-actions{justify-content:flex-start}.app{padding:calc(12px + env(safe-area-inset-top,0px)) 10px calc(42px + env(safe-area-inset-bottom,0px))}.top{margin-bottom:12px}.sync{display:none}.hero{padding:18px}.hero-top{display:block}.year{margin-top:13px}.profit{font-size:36px}.kpis{gap:7px}.kpi{padding:11px}.kpi .value{font-size:15px}.form{grid-template-columns:1fr 1fr}.section-head{padding:15px 14px 11px}.trades{padding:0 9px 9px}.trade{grid-template-columns:42px 1fr auto;gap:9px;padding:13px 4px}.logo{width:39px;height:39px}.trade-result .profit{font-size:12px}.trade-main b{font-size:12px}.detail-grid,.modal-grid{grid-template-columns:1fr}.modal-grid .field.full{grid-column:auto}.hero-sub{max-width:310px}}
 </style>
 <script>
-/* Reliable menu fallbacks: expose Target and Mutual Funds even if an older menu script is cached. */
-document.addEventListener('click',function(e){
-  if(!e.target.closest||!e.target.closest('#bptMenuButton'))return;
-  setTimeout(function(){
+/* Reliable menu fallbacks: inject Target whenever the drawer is actually rendered, including delayed/cached menu builds. */
+(function(){
+  function addMenuFallbacks(){
     const drawer=document.querySelector('.app-drawer');
     const actions=drawer&&drawer.querySelector('aside > div');
     if(!actions)return;
@@ -66,9 +65,20 @@ document.addEventListener('click',function(e){
       });
       actions.appendChild(button);
     }
-  },0);
-});
-</script>
+  }
+  document.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('#bptMenuButton')){
+      [0,50,150,300,600].forEach(delay=>setTimeout(addMenuFallbacks,delay));
+    }
+  });
+  if(document.body){
+    new MutationObserver(addMenuFallbacks).observe(document.body,{childList:true,subtree:true});
+    addMenuFallbacks();
+  }else document.addEventListener('DOMContentLoaded',function(){
+    new MutationObserver(addMenuFallbacks).observe(document.body,{childList:true,subtree:true});
+    addMenuFallbacks();
+  });
+})();</script>
 <script src="app-config.js?v=58"></script>
 <style>
 /* S23 Ultra / touch-device mobile layout: prevent desktop 980px canvas from being scaled down */
