@@ -97,6 +97,23 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // Separate short-term Trading Goals account: completed trades and capital movements only.
+    // These records are intentionally separate from the main trades/charges/fundProfits collections.
+    match /users/{userId}/tradingGoalEntries/{entryId} {
+      allow read, delete: if owner(userId) || isAdmin();
+      allow create, update: if (owner(userId) || isAdmin())
+        && request.resource.data.type in ['trade', 'deposit', 'withdrawal']
+        && request.resource.data.date is string;
+    }
+    match /users/{userId}/tradingGoalSettings/{settingId} {
+      allow read, delete: if owner(userId) || isAdmin();
+      allow create, update: if (owner(userId) || isAdmin())
+        && request.resource.data.initialCapital is number
+        && request.resource.data.targetCapital is number
+        && request.resource.data.initialCapital > 0
+        && request.resource.data.targetCapital > request.resource.data.initialCapital;
+    }
+
     // Usage / installation records are private to the owner or an administrator.
     match /users/{userId}/usage/{documentId} {
       allow read, write: if owner(userId) || isAdmin();
