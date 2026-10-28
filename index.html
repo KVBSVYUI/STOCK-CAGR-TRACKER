@@ -9,7 +9,7 @@
 <meta name="application-name" content="Booked Profit Tracker">
 <meta name="description" content="Booked Profit Tracker — clean realized stock profit tracking with live cloud sync.">
 <link rel="manifest" href="manifest.webmanifest">
-<script src="./app-lock.js?v=1"></script>
+<script src="./app-lock.js?v=2"></script>
 
 <title>Booked Profit Tracker</title>
 <style>
@@ -496,6 +496,7 @@ function appSettingsModal(){
       <div class="account-section-title">App</div>
       <div class="account-action"><span><b>Cloud sync</b><span>Live synchronization is enabled.</span></span><i class="account-arrow">✓</i></div>
       <div class="account-action"><span><b>Appearance</b><span>Premium dark interface.</span></span><i class="account-arrow">•</i></div>
+      <button class="account-action" id="settingsAppLock" type="button"><span><b>App lock · PIN & fingerprint</b><span>Change PIN or recover it using your account password.</span></span><i class="account-arrow">›</i></button>
     </div>
     <div class="account-section">
       <div class="account-section-title">Data</div>
@@ -504,6 +505,8 @@ function appSettingsModal(){
   </div>`;
   document.body.appendChild(back);
   settingsClose.onclick=()=>back.remove();
+  const settingsAppLock=document.getElementById('settingsAppLock');
+  settingsAppLock.onclick=()=>{if(window.BPT_APP_LOCK_SETTINGS){back.remove();window.BPT_APP_LOCK_SETTINGS()}else alert('App lock is still loading. Please try again.');};
   back.onclick=e=>{if(e.target===back)back.remove()};
   settingsExport.onclick=()=>{back.remove();exportData()};
 }
