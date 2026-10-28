@@ -366,10 +366,13 @@ async function attachTradeStockAutocomplete(input,box){
     if(!data.length){box.innerHTML='<div class="company-empty">Stock list unavailable. You can still type a ticker manually.</div>';return}
     const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
     const nq=norm(q);
-    const hits=data.map(r=>({...r,score:norm(r.ticker)===nq?0:norm(r.ticker).startsWith(nq)?1:norm(r.name).startsWith(nq)?2:norm(r.name).includes(nq)?3:99}))
+    const ranked=data.map(r=>({...r,score:norm(r.ticker)===nq?0:norm(r.ticker).startsWith(nq)?1:norm(r.name).startsWith(nq)?2:norm(r.name).includes(nq)?3:99}))
       .filter(r=>r.score<99)
-      .sort((a,b)=>a.score-b.score||((String(a.exchange).toUpperCase()==='NSE'?0:1)-(String(b.exchange).toUpperCase()==='NSE'?0:1))||String(a.name).localeCompare(String(b.name)))
-      .slice(0,8);
+      .sort((a,b)=>a.score-b.score||((String(a.exchange).toUpperCase()==='NSE'?0:1)-(String(b.exchange).toUpperCase()==='NSE'?0:1))||String(a.name).localeCompare(String(b.name)));
+    // For a company-name search, show one canonical listing (prefer NSE) instead of duplicate BSE code rows.
+    // Exact ticker/code searches still return that specific exchange listing.
+    const seen=new Set(),hits=[];
+    for(const r of ranked){const key=r.isin||norm(r.name);if(seen.has(key))continue;seen.add(key);hits.push(r);if(hits.length===8)break;}
     if(!hits.length){box.innerHTML='<div class="company-empty">No match found. You can still type a ticker manually.</div>';return}
     box.innerHTML=hits.map((r,i)=>{
       const logo=logoUrl(r.ticker,r.exchange,r.isin);
