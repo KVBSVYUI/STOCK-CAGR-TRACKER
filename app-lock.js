@@ -1,6 +1,9 @@
 (function(){
   'use strict';
   const KEY='bpt_app_lock_v1';
+  const SESSION_KEY='bpt_app_lock_unlocked_v1';
+  const BACKGROUND_KEY='bpt_app_lock_background_at_v1';
+  const GRACE_MS=60*1000;
   const ROOT=document.documentElement;
   const STYLE=`#bpt-app-lock{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:20px;background:radial-gradient(800px 500px at 20% 0%,#15243a,#070b12 65%);color:#f4f7fb;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:auto}#bpt-app-lock *{box-sizing:border-box}#bpt-app-lock .bpt-lock-card{width:min(420px,100%);padding:26px 22px;border:1px solid #2a3a51;border-radius:25px;background:linear-gradient(180deg,#111c2b,#0b121d);box-shadow:0 24px 80px #000a}#bpt-app-lock h1{font-size:25px;letter-spacing:-.04em;margin:0}#bpt-app-lock p{font-size:13px;line-height:1.5;color:#94a3b8;margin:9px 0 20px}#bpt-app-lock label{display:block;font-size:12px;color:#aab8ca;margin:0 0 7px}#bpt-app-lock input{width:100%;height:54px;border:1px solid #2b3c52;border-radius:14px;background:#070e18;color:#fff;text-align:center;font-size:24px;letter-spacing:.28em;outline:none}#bpt-app-lock input:focus{border-color:#42d99d;box-shadow:0 0 0 3px #42d99d20}#bpt-app-lock button{width:100%;min-height:48px;border:0;border-radius:13px;margin-top:10px;padding:12px;font-weight:800;font-size:14px;background:linear-gradient(135deg,#6ce8b5,#2bc88d);color:#062015}#bpt-app-lock button.secondary{background:#172233;border:1px solid #2b3c52;color:#e8eef7}#bpt-app-lock .bpt-lock-error{min-height:18px;margin-top:8px;color:#ff8d95;font-size:12px;text-align:center}#bpt-app-lock .bpt-lock-note{font-size:10px;color:#66788f;text-align:center;margin-top:16px}html.bpt-locking body>*:not(#bpt-app-lock){visibility:hidden!important}html.bpt-locking body{overflow:hidden!important}html.bpt-locking #bpt-app-lock{visibility:visible!important}`;
   ROOT.classList.add('bpt-locking');
@@ -14,9 +17,27 @@
   async function hashPin(pin,salt){const key=await crypto.subtle.importKey('raw',enc.encode(pin),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:unb64u(salt),iterations:180000,hash:'SHA-256'},key,256);return b64u(bits)}
   function shell(title,desc,body){if(!overlay){overlay=document.createElement('div');overlay.id='bpt-app-lock';document.body.appendChild(overlay)}overlay.innerHTML='<section class="bpt-lock-card" role="dialog" aria-modal="true" aria-labelledby="bpt-lock-title"><h1 id="bpt-lock-title">🔒 '+title+'</h1><p>'+desc+'</p>'+body+'<div class="bpt-lock-error" id="bpt-lock-error" role="status"></div><div class="bpt-lock-note">App lock is local to this browser/device. Firebase login and cloud data are unchanged.</div></section>'}
   function error(msg){const e=document.getElementById('bpt-lock-error');if(e)e.textContent=msg}
-  function unlock(){unlocked=true;ROOT.classList.remove('bpt-locking');if(overlay){overlay.remove();overlay=null}document.removeEventListener('visibilitychange',onVisibility);document.addEventListener('visibilitychange',onVisibility); }
-  function lock(){if(!cfg()||document.visibilityState==='hidden'){}unlocked=false;ROOT.classList.add('bpt-locking');if(document.body)showUnlock()}
-  function onVisibility(){if(document.visibilityState==='hidden'){lock()}}
+  function unlock(){
+    unlocked=true;
+    try{sessionStorage.setItem(SESSION_KEY,'1');sessionStorage.removeItem(BACKGROUND_KEY)}catch(_){}
+    ROOT.classList.remove('bpt-locking');
+    if(overlay){overlay.remove();overlay=null}
+  }
+  function lock(){
+    unlocked=false;
+    try{sessionStorage.removeItem(SESSION_KEY);sessionStorage.removeItem(BACKGROUND_KEY)}catch(_){}
+    ROOT.classList.add('bpt-locking');
+    if(document.body)showUnlock();
+  }
+  function markBackgrounded(){try{if(cfg()&&sessionStorage.getItem(SESSION_KEY)==='1')sessionStorage.setItem(BACKGROUND_KEY,String(Date.now()))}catch(_){}}
+  function onVisibility(){
+    if(document.visibilityState==='hidden'){markBackgrounded();return}
+    if(!cfg())return;
+    let active=false,hiddenAt=0;
+    try{active=sessionStorage.getItem(SESSION_KEY)==='1';hiddenAt=Number(sessionStorage.getItem(BACKGROUND_KEY)||0)}catch(_){}
+    if(active&&hiddenAt&&Date.now()-hiddenAt>GRACE_MS){lock();return}
+    if(active){try{sessionStorage.removeItem(BACKGROUND_KEY)}catch(_){};unlocked=true;ROOT.classList.remove('bpt-locking');if(overlay){overlay.remove();overlay=null}}
+  }
   async function createPin(){
     const pin=document.getElementById('bpt-pin').value,confirm=document.getElementById('bpt-pin-confirm').value;
     if(!/^\d{4,8}$/.test(pin)){error('Choose a PIN of 4–8 digits.');return}
@@ -89,6 +110,23 @@
   function showSettings(){shell('App lock settings','Change your PIN or recover it using your Booked Profit Tracker account password.','<button id="bpt-settings-change">Change PIN</button><button class="secondary" id="bpt-settings-forgot">Forgot PIN?</button><button class="secondary" id="bpt-settings-close">Close</button>');document.getElementById('bpt-settings-change').onclick=showChangePin;document.getElementById('bpt-settings-forgot').onclick=showForgotPin;document.getElementById('bpt-settings-close').onclick=()=>{if(overlay){overlay.remove();overlay=null}}}
   window.BPT_APP_LOCK_SETTINGS=showSettings;
 
-  function init(){if(!document.body){document.addEventListener('DOMContentLoaded',init,{once:true});return}showUnlock();document.addEventListener('visibilitychange',onVisibility);window.addEventListener('pagehide',()=>{if(cfg())lock()});window.addEventListener('pageshow',e=>{if(cfg()&&e.persisted)lock()})}
+  function init(){
+    if(!document.body){document.addEventListener('DOMContentLoaded',init,{once:true});return}
+    document.addEventListener('visibilitychange',onVisibility);
+    window.addEventListener('pagehide',markBackgrounded);
+    window.addEventListener('pageshow',e=>{if(e.persisted)onVisibility()});
+    const c=cfg();
+    if(!c){showUnlock();return}
+    let active=false,hiddenAt=0;
+    try{active=sessionStorage.getItem(SESSION_KEY)==='1';hiddenAt=Number(sessionStorage.getItem(BACKGROUND_KEY)||0)}catch(_){}
+    if(active&&(!hiddenAt||Date.now()-hiddenAt<=GRACE_MS)){
+      unlocked=true;
+      try{sessionStorage.removeItem(BACKGROUND_KEY)}catch(_){}
+      ROOT.classList.remove('bpt-locking');
+      if(overlay){overlay.remove();overlay=null}
+    }else{
+      lock();
+    }
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
