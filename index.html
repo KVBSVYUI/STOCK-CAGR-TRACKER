@@ -424,7 +424,48 @@ function fundManagerModal(){
   back.querySelectorAll('[data-mf-edit]').forEach(b=>b.onclick=()=>{const f=fundProfits.find(x=>x.id===b.dataset.mfEdit);if(f){back.remove();fundProfitModal(f)}});
   back.querySelectorAll('[data-mf-delete]').forEach(b=>b.onclick=async()=>{const f=fundProfits.find(x=>x.id===b.dataset.mfDelete);if(f&&confirm('Delete this fund profit?'))try{await deleteDoc(doc(db,'users',auth.currentUser.uid,'fundProfits',f.id));back.remove();fundManagerModal()}catch(e){alert('Could not delete fund profit: '+(e.code||'error'))}});
 }
-function chargeModal(existing=null){const back=document.createElement('div');back.className='modal-back open';const editing=!!existing;back.innerHTML=`<div class="modal"><button class="close" id="x">×</button><h3>${editing?'Edit charge':'Add charge'}</h3><p>Manually enter brokerage, taxes, GST, exchange charges or any other cost. It will reduce net profit for that date/year.</p><div class="modal-grid"><div class="field"><label>Charge amount ₹</label><input id="ca" type="number" min="0" step=".01" placeholder="2439.90"></div><div class="field"><label>Date</label><input id="cd" type="date"></div><div class="field full"><label>Note (optional)</label><input id="cn" maxlength="80" placeholder="Brokerage + taxes"></div></div><div class="modal-actions"><button class="secondary" id="cancel">Cancel</button><button class="primary" id="save">${editing?'Update charge':'Save charge'}</button></div></div>`;document.body.appendChild(back);ca.value=existing?Number(existing.amount||0):'';cd.value=existing?.date||new Date().toISOString().slice(0,10);cn.value=existing?.note||'';x.onclick=cancel.onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()};save.onclick=async()=>{const amount=Number(ca.value),date=cd.value,note=cn.value.trim();if(!(amount>=0)||!date)return alert('Enter amount and date.');try{if(editing){const ref=doc(db,'users',auth.currentUser.uid,'charges',existing.id);await updateDoc(ref,{amount,date,note})}else{await addDoc(collection(db,'users',auth.currentUser.uid,'charges'),{amount,date,note,createdAt:serverTimestamp()})}back.remove()}catch(e){alert((editing?'Could not update charge: ':'Could not save charge: ')+(e.code||'error')+' - '+(e.message||''))}}}
+function chargeModal(existing=null){
+  const back=document.createElement('div');
+  back.className='modal-back open';
+  const editing=!!existing;
+  back.innerHTML=`<div class="modal"><button class="close" id="chargeModalClose" type="button">×</button><h3>${editing?'Edit charge':'Add charge'}</h3><p>Manually enter brokerage, taxes, GST, exchange charges or any other cost. It will reduce net profit for that date/year.</p><div class="modal-grid"><div class="field"><label>Charge amount ₹</label><input id="chargeAmountInput" type="number" min="0" step=".01" placeholder="2439.90"></div><div class="field"><label>Date</label><input id="chargeDateInput" type="date"></div><div class="field full"><label>Note (optional)</label><input id="chargeNoteInput" maxlength="80" placeholder="Brokerage + taxes"></div></div><div class="modal-actions"><button class="secondary" id="chargeCancelButton" type="button">Cancel</button><button class="primary" id="chargeSaveButton" type="button">${editing?'Update charge':'Save charge'}</button></div></div>`;
+  document.body.appendChild(back);
+  const amountInput=back.querySelector('#chargeAmountInput');
+  const dateInput=back.querySelector('#chargeDateInput');
+  const noteInput=back.querySelector('#chargeNoteInput');
+  const closeButton=back.querySelector('#chargeModalClose');
+  const cancelButton=back.querySelector('#chargeCancelButton');
+  const saveButton=back.querySelector('#chargeSaveButton');
+  amountInput.value=editing?Number(existing.amount||0):'';
+  dateInput.value=(editing&&existing.date)||new Date().toISOString().slice(0,10);
+  noteInput.value=(editing&&existing.note)||'';
+  const close=()=>back.remove();
+  closeButton.onclick=cancelButton.onclick=close;
+  back.onclick=e=>{if(e.target===back)close()};
+  saveButton.onclick=async()=>{
+    const amount=Number(amountInput.value),date=dateInput.value,note=noteInput.value.trim();
+    if(amountInput.value.trim()===''||!Number.isFinite(amount)||amount<0||!date)return alert('Enter a valid non-negative charge amount and date.');
+    const user=auth&&auth.currentUser;
+    if(!user||!user.uid)return alert('Your session is not ready. Please sign in again and retry.');
+    if(editing&&(!existing.id||typeof existing.id!=='string'))return alert('This charge is missing its record ID. Refresh the app and try again.');
+    saveButton.disabled=true;
+    saveButton.textContent=editing?'Updating…':'Saving…';
+    try{
+      if(editing){
+        const chargeRef=doc(db,'users',user.uid,'charges',existing.id);
+        await updateDoc(chargeRef,{amount,date,note});
+      }else{
+        await addDoc(collection(db,'users',user.uid,'charges'),{amount,date,note,createdAt:serverTimestamp()});
+      }
+      close();
+    }catch(e){
+      console.error('Charge save failed',e);
+      alert((editing?'Could not update charge: ':'Could not save charge: ')+(e&&e.code?e.code:'error')+' - '+(e&&e.message?e.message:'Unknown error'));
+      saveButton.disabled=false;
+      saveButton.textContent=editing?'Update charge':'Save charge';
+    }
+  };
+}
 function detailModal(t){const qty=Number(t.quantity||1),avg=Number(t.avgBuy||0),sp=Number(t.sellPrice??(qty?Number(t.sale||0)/qty:0)),c=Number(t.cost??qty*avg),s=Number(t.sale??qty*sp),p=s-c,r=c?p/c:0;const back=document.createElement('div');back.className='modal-back open';back.innerHTML=`<div class="modal"><button class="close" id="x">×</button><div class="detail-head"><div class="detail-logo">${logoHtml(t)}</div><div class="detail-name"><b>${esc(displayCompanyName(t))}</b><span>${esc(displayTickerLabel(t))} · ${qty} shares · ${fmt(t.buyDate)} → ${fmt(t.sellDate)}</span></div></div><div class="detail-grid"><div class="detail-item"><span>Average buy</span><b>${money(avg)}</b></div><div class="detail-item"><span>Sell price</span><b>${money(sp)}</b></div><div class="detail-item"><span>Total buy value</span><b>${money(c)}</b></div><div class="detail-item"><span>Total sell value</span><b>${money(s)}</b></div><div class="detail-item"><span>Booked profit</span><b class="${p>=0?'pos':'neg'}">${p>=0?'+':''}${money(p)}</b></div><div class="detail-item"><span>Return booked</span><b class="${r>=0?'pos':'neg'}">${r>=0?'+':''}${(r*100).toFixed(2)}%</b></div></div><div class="modal-actions"><button class="secondary" id="cancel">Close</button></div></div>`;document.body.appendChild(back);x.onclick=cancel.onclick=()=>back.remove();back.onclick=e=>{if(e.target===back)back.remove()}}
 function accountModal(){
   const user=auth.currentUser||{};
