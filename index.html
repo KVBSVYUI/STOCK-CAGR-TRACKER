@@ -325,7 +325,7 @@ window.addEventListener('unhandledrejection',function(e){
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile,signOut,reauthenticateWithCredential,EmailAuthProvider,updatePassword} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
-import {getFirestore,collection,addDoc,deleteDoc,updateDoc,doc,onSnapshot,query,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+import {getFirestore,collection,addDoc,deleteDoc,updateDoc,setDoc,doc,onSnapshot,query,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 const CONFIG=window.APP_CONFIG||{},root=document.getElementById('root');let app,auth,db,unsubTrades=null,unsubCharges=null,unsubFundProfits=null,trades=[],charges=[],fundProfits=[],selectedYear='all';
 const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -447,20 +447,24 @@ function chargeModal(existing=null){
     if(amountInput.value.trim()===''||!Number.isFinite(amount)||amount<0||!date)return alert('Enter a valid non-negative charge amount and date.');
     const user=auth&&auth.currentUser;
     if(!user||!user.uid)return alert('Your session is not ready. Please sign in again and retry.');
-    if(editing&&(!existing.id||typeof existing.id!=='string'))return alert('This charge is missing its record ID. Refresh the app and try again.');
+    const chargeId=editing?String(existing&&existing.id||'').trim():'';
+    if(editing&&!chargeId)return alert('This charge is missing its record ID. Refresh the app and try again.');
     saveButton.disabled=true;
     saveButton.textContent=editing?'Updating…':'Saving…';
     try{
+      const chargesRef=collection(db,'users',user.uid,'charges');
       if(editing){
-        const chargeRef=doc(db,'users',user.uid,'charges',existing.id);
-        await updateDoc(chargeRef,{amount,date,note});
+        // Use a validated document ID and merge only the editable charge fields.
+        const chargeRef=doc(chargesRef,chargeId);
+        await setDoc(chargeRef,{amount,date,note},{merge:true});
       }else{
-        await addDoc(collection(db,'users',user.uid,'charges'),{amount,date,note,createdAt:serverTimestamp()});
+        await addDoc(chargesRef,{amount,date,note,createdAt:serverTimestamp()});
       }
       close();
     }catch(e){
       console.error('Charge save failed',e);
-      alert((editing?'Could not update charge: ':'Could not save charge: ')+(e&&e.code?e.code:'error')+' - '+(e&&e.message?e.message:'Unknown error'));
+      const detail=e&&e.message?e.message:'Unknown error';
+      alert((editing?'Could not update charge: ':'Could not save charge: ')+(e&&e.code?e.code:'error')+' - '+detail);
       saveButton.disabled=false;
       saveButton.textContent=editing?'Update charge':'Save charge';
     }
