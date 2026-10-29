@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-28",
-  "source": "NSE/BSE equity universe snapshot; updated 2026-10-28 with verified recent equity listings from NSE recent listings.",
+  "updated": "2026-10-29",
+  "source": "NSE/BSE equity universe snapshot; updated 2026-10-29 with verified Moneyview Limited listing identifiers (NSE MONEYVIEW, BSE 544953).",
   "records": [
     {
       "ticker": "1STCUS",
@@ -41371,6 +41371,18 @@
       "name": "Zydus Wellness Limited",
       "exchange": "NSE",
       "isin": "INE768C01028"
+    },
+    {
+      "ticker": "MONEYVIEW",
+      "name": "Moneyview Limited",
+      "exchange": "NSE",
+      "isin": "INE0PTN01011"
+    },
+    {
+      "ticker": "544953",
+      "name": "Moneyview Limited",
+      "exchange": "BSE",
+      "isin": "INE0PTN01011"
     }
   ]
 }
