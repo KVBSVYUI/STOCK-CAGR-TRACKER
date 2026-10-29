@@ -447,19 +447,19 @@ function chargeModal(existing=null){
     if(amountInput.value.trim()===''||!Number.isFinite(amount)||amount<0||!date)return alert('Enter a valid non-negative charge amount and date.');
     const user=auth&&auth.currentUser;
     if(!user||!user.uid)return alert('Your session is not ready. Please sign in again and retry.');
-    const chargeId=editing?String(existing&&existing.id||'').trim():'';
-    if(editing&&!chargeId)return alert('This charge is missing its record ID. Refresh the app and try again.');
+    const chargeId=editing?String(existing?.id??existing?.docId??'').trim():'';
+    if(editing&&(!chargeId||chargeId.includes('/')))return alert('This charge has an invalid record ID. Refresh the app and try again.');
     saveButton.disabled=true;
     saveButton.textContent=editing?'Updating…':'Saving…';
     try{
-      if(!db)throw new Error('Database is not ready. Please reload and sign in again.');
+      if(!db||typeof user.uid!=='string'||!user.uid.trim())throw new Error('Database or signed-in user is not ready. Please reload and sign in again.');
+      const chargesRef=collection(db,'users',user.uid,'charges');
       if(editing){
-        // Address the existing charge by its full user-scoped Firestore path.
-        // This updates only editable fields and preserves other stored metadata.
-        const chargeRef=doc(db,'users',user.uid,'charges',chargeId);
+        // Build the reference from the user-scoped charges collection, then its validated document ID.
+        // Preserve existing fields and update only the amount, date and note.
+        const chargeRef=doc(chargesRef,chargeId);
         await updateDoc(chargeRef,{amount,date,note});
       }else{
-        const chargesRef=collection(db,'users',user.uid,'charges');
         await addDoc(chargesRef,{amount,date,note,createdAt:serverTimestamp()});
       }
       close();
