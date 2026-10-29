@@ -452,12 +452,14 @@ function chargeModal(existing=null){
     saveButton.disabled=true;
     saveButton.textContent=editing?'Updating…':'Saving…';
     try{
-      const chargesRef=collection(db,'users',user.uid,'charges');
+      if(!db)throw new Error('Database is not ready. Please reload and sign in again.');
       if(editing){
-        // Use a validated document ID and merge only the editable charge fields.
-        const chargeRef=doc(chargesRef,chargeId);
-        await setDoc(chargeRef,{amount,date,note},{merge:true});
+        // Address the existing charge by its full user-scoped Firestore path.
+        // This updates only editable fields and preserves other stored metadata.
+        const chargeRef=doc(db,'users',user.uid,'charges',chargeId);
+        await updateDoc(chargeRef,{amount,date,note});
       }else{
+        const chargesRef=collection(db,'users',user.uid,'charges');
         await addDoc(chargesRef,{amount,date,note,createdAt:serverTimestamp()});
       }
       close();
