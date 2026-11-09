@@ -114,6 +114,11 @@ service cloud.firestore {
         && request.resource.data.targetCapital > request.resource.data.initialCapital;
     }
 
+    // Rental income is private to each user and kept separate from trading profits.
+    match /users/{userId}/rentalIncome/{entryId} {
+      allow read, write: if owner(userId) || isAdmin();
+    }
+
     // Usage / installation records are private to the owner or an administrator.
     match /users/{userId}/usage/{documentId} {
       allow read, write: if owner(userId) || isAdmin();
