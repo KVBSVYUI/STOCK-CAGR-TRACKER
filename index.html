@@ -322,10 +322,15 @@ html.bpt-phone .delete,body.bpt-phone .delete{font-size:22px}
 .rent-brand{flex:1;min-width:0}.rent-brand small{color:#929ba8;font-size:10px;letter-spacing:.12em}.rent-brand h1{font-size:22px;margin:3px 0 0;letter-spacing:-.03em}
 .rent-account{border:1px solid #214a3b;background:#10271f;color:#58d9a3;border-radius:999px;padding:8px 10px;font-size:9px;font-weight:850;letter-spacing:.04em}
 .rent-intro{display:flex;justify-content:space-between;gap:12px;margin:8px 0 20px}.rent-intro h2{font-size:clamp(25px,6vw,32px);line-height:1.1;letter-spacing:-.05em;margin:0}.rent-intro p{color:#929ba8;font-size:12px;line-height:1.55;margin:8px 0 0;max-width:500px}
-.rent-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.rent-metric{min-width:0;min-height:112px;padding:15px;background:linear-gradient(145deg,#14181e,#101318);border:1px solid #292f38;border-radius:20px}
-.rent-metric span{display:block;color:#929ba8;font-size:10px}.rent-metric strong{display:block;margin-top:13px;font-size:clamp(18px,4.7vw,25px);letter-spacing:-.04em;overflow-wrap:anywhere}
-#rentPageTotal{color:#58d9a3}.rent-metric small{display:block;color:#929ba8;font-size:9px;margin-top:5px}
+.rent-summary{display:grid;gap:10px;margin-bottom:13px}
+.rent-total-card{min-width:0;padding:19px 18px;background:#12171d;border:1px solid #29313a;border-radius:20px}
+.rent-total-card span,.rent-summary-card span{display:block;color:#929ba8;font-size:11px}
+.rent-total-card strong{display:block;margin-top:9px;color:#58d9a3;font-size:clamp(27px,7vw,34px);font-weight:850;letter-spacing:-.045em;line-height:1.15;overflow-wrap:anywhere}
+.rent-total-card small,.rent-summary-card small{display:block;color:#929ba8;font-size:10px;margin-top:6px}
+.rent-secondary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.rent-summary-card{min-width:0;min-height:105px;padding:15px;background:#12171d;border:1px solid #29313a;border-radius:18px}
+.rent-summary-card strong{display:block;margin-top:12px;color:#f5f7f9;font-size:clamp(18px,4.5vw,23px);font-weight:800;letter-spacing:-.035em;overflow-wrap:anywhere}
+@media(min-width:650px){.rent-total-card{padding:22px 24px}.rent-secondary-grid{gap:12px}.rent-summary-card{padding:18px}}
 .rent-history{margin-top:13px}.rent-page-panel{display:block!important;visibility:visible!important;margin:0!important;background:linear-gradient(145deg,#14181e,#101318)!important;border:1px solid #292f38!important;border-radius:21px!important;box-shadow:none!important;overflow:hidden}
 .rent-page-panel .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 16px 13px}
 .rent-page-panel .title{font-size:16px}.rent-page-panel .sub{font-size:10px;line-height:1.5}
@@ -341,7 +346,7 @@ html.bpt-phone .delete,body.bpt-phone .delete{font-size:22px}
 .rent-page-panel .charge-actions{gap:5px}.rent-page-panel .mini-btn{padding:8px 10px;font-size:10px}
 .rent-page-panel .empty{padding:30px 12px!important;line-height:1.6}
 .rent-footnote{color:#77818e;font-size:10px;line-height:1.55;padding:12px 3px 0}
-@media(min-width:650px){.rent-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.rent-metric{padding:16px}.rent-page-panel .section-head{padding:19px 20px 15px}}
+@media(min-width:650px){.rent-page-panel .section-head{padding:19px 20px 15px}}
 @media(max-width:390px){.rent-page{padding-left:11px;padding-right:11px}.rent-page-header{gap:9px}.rent-brand h1{font-size:20px}.rent-account{font-size:8px;padding:7px 8px}.rent-page-panel .section-head{align-items:flex-start;flex-wrap:wrap}.rent-page-panel .section-head-right{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto}.rent-page-panel .trade-sort{max-width:none;width:100%}.rent-page-panel .charge-row{grid-template-columns:minmax(0,1fr) auto;gap:7px}.rent-page-panel .charge-amount{grid-column:2;grid-row:1}.rent-page-panel .charge-actions{grid-column:1/-1;justify-content:flex-end}}
 </style></head>
 <body><div id="root"><main class="auth"><div class="auth-card"><h2>Loading Booked Profit Tracker…</h2><p id="bootStatus">Starting the app…</p></div></main></div>
@@ -474,7 +479,7 @@ function rentalIncomeManager(){
  if(!section||!section.hidden)return;
  const parent=section.parentNode,next=section.nextSibling;
  const back=document.createElement('div');back.className='rent-page-back';
- back.innerHTML='<main class="rent-page"><header class="rent-page-header"><button class="rent-back" id="rentManagerClose" type="button" aria-label="Back">‹</button><div class="rent-brand"><small>BOOKED PROFIT TRACKER</small><h1>Rental income</h1></div><span class="rent-account">CLOUD SYNC</span></header><section class="rent-intro"><div><h2>Your rental income.</h2><p>Track every payment, review yearly totals, and manage your rent history.</p></div></section><section class="rent-metrics"><div class="rent-metric"><span>Total rent received</span><strong id="rentPageTotal">₹0.00</strong><small id="rentPagePeriod">Across all years</small></div><div class="rent-metric"><span>Payments recorded</span><strong id="rentPageCount">0</strong><small>Rent entries</small></div><div class="rent-metric"><span>Latest payment</span><strong id="rentPageLatest">—</strong><small id="rentPageLatestDate">No payments yet</small></div></section><section class="rent-history" id="rentManagerContent"></section><p class="rent-footnote">Rental income is tracked separately and does not change your booked stock or mutual-fund profit.</p></main>';
+ back.innerHTML='<main class="rent-page"><header class="rent-page-header"><button class="rent-back" id="rentManagerClose" type="button" aria-label="Back">‹</button><div class="rent-brand"><small>BOOKED PROFIT TRACKER</small><h1>Rental income</h1></div><span class="rent-account">CLOUD SYNC</span></header><section class="rent-intro"><div><h2>Your rental income.</h2><p>Track every payment, review yearly totals, and manage your rent history.</p></div></section><section class="rent-summary"><div class="rent-total-card"><span>Total rent received</span><strong id="rentPageTotal">₹0.00</strong><small id="rentPagePeriod">Across all years</small></div><div class="rent-secondary-grid"><div class="rent-summary-card"><span>Payments recorded</span><strong id="rentPageCount">0</strong><small>Rent entries</small></div><div class="rent-summary-card"><span>Latest payment</span><strong id="rentPageLatest">—</strong><small id="rentPageLatestDate">No payments yet</small></div></div></section><section class="rent-history" id="rentManagerContent"></section><p class="rent-footnote">Rental income is tracked separately and does not change your booked stock or mutual-fund profit.</p></main>';
  document.body.appendChild(back);
  const content=back.querySelector('#rentManagerContent');
  section.hidden=false;section.classList.add('rent-page-panel');content.appendChild(section);
