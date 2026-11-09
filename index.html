@@ -62,6 +62,20 @@
       const label=(item.textContent||'').replace(/\s+/g,' ').trim();
       if(/^🎯?\s*Target\s*[·•-]\s*₹\s*1\s*Cr$/i.test(label))item.remove();
     });
+    // Rental Income must remain available even when an older cached app-config.js builds the drawer.
+    if(!document.getElementById('bptMenuRent')){
+      const rent=document.createElement('button');
+      rent.id='bptMenuRent';rent.type='button';rent.className='secondary';
+      rent.style.textAlign='left';rent.textContent='🏠 Rental Income';
+      rent.addEventListener('click',function(){
+        drawer.remove();
+        if(window.BPT_RENTAL_INCOME_MODAL){window.BPT_RENTAL_INCOME_MODAL();return;}
+        alert('Rental Income is still loading. Please refresh once and try again.');
+      });
+      const mailbox=actions.querySelector('#bptMenuMailbox');
+      if(mailbox&&mailbox.nextSibling)actions.insertBefore(rent,mailbox.nextSibling);
+      else actions.appendChild(rent);
+    }
     if(!document.getElementById('bptMenuTarget')){
       const target=document.createElement('button');
       target.id='bptMenuTarget';target.type='button';target.className='secondary';
@@ -98,7 +112,7 @@
     addMenuFallbacks();
   });
 })();</script>
-<script src="app-config.js?v=58"></script>
+<script src="app-config.js?v=59"></script>
 <style>
 /* S23 Ultra / touch-device mobile layout: prevent desktop 980px canvas from being scaled down */
 @media screen and (max-width: 1000px){
@@ -346,7 +360,7 @@ window.addEventListener('unhandledrejection',function(e){
   var phone=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||window.matchMedia('(display-mode: standalone)').matches||w<=600||((window.screen&&window.screen.width<=600));
   document.documentElement.classList.toggle('bpt-phone',phone); document.body.classList.toggle('bpt-phone',phone);
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js?v=55',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=56',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
   }
 })();
 </script>
