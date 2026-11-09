@@ -477,6 +477,8 @@ function rentalIncomeManager(){
  document.body.appendChild(back);
  const content=back.querySelector('#rentManagerContent');
  section.hidden=false;section.classList.add('rent-page-panel');content.appendChild(section);
+ // Refresh the page-level rental summary after its metric elements exist in the DOM.
+ render();
  const close=()=>{if(parent){parent.insertBefore(section,next&&next.parentNode===parent?next:null);section.hidden=true;section.classList.remove('rent-page-panel')}back.remove()};
  back.querySelector('#rentManagerClose').onclick=close;
 }
