@@ -119,7 +119,7 @@
       const check=async()=>{
         if(Date.now()<waitUntil){error('Too many attempts. Wait 30 seconds and try again.');return}
         const pin=input.value;
-        if(!/^\\d{4,8}$/.test(pin)){error('Enter your 4–8 digit App PIN.');return}
+        if(!/^\d{4,8}$/.test(pin)){error('Enter your 4–8 digit App PIN.');return}
         verify.disabled=true;verify.textContent='Checking…';
         try{
           if(await hashPin(pin,c.salt)===c.digest){finish(true);return}
