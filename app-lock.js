@@ -108,6 +108,32 @@
   async function verifyAccountPassword(password){const appMod=await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js'),authMod=await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js');const app=appMod.getApp(),auth=authMod.getAuth(app),user=auth.currentUser;if(!user||!user.email)throw new Error('Please sign in to your account again before recovering your PIN.');const credential=authMod.EmailAuthProvider.credential(user.email,password);await authMod.reauthenticateWithCredential(user,credential)}
   function showForgotPin(){shell('Recover app PIN','Verify your Booked Profit Tracker account password to set a new app PIN. This does not change your account password.','<label for="bpt-recover-password">Account password</label><input id="bpt-recover-password" type="password" autocomplete="current-password"><label for="bpt-recover-new" style="margin-top:12px">New app PIN</label><input id="bpt-recover-new" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"><label for="bpt-recover-confirm" style="margin-top:12px">Confirm new PIN</label><input id="bpt-recover-confirm" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"><button id="bpt-recover-save">Verify account & reset PIN</button><button class="secondary" id="bpt-recover-cancel">Cancel</button>');document.getElementById('bpt-recover-cancel').onclick=showUnlock;document.getElementById('bpt-recover-save').onclick=async()=>{const password=document.getElementById('bpt-recover-password').value;if(!password){error('Enter your account password.');return}const pin=document.getElementById('bpt-recover-new').value,confirm=document.getElementById('bpt-recover-confirm').value;if(!/^\d{4,8}$/.test(pin)){error('Choose a PIN of 4–8 digits.');return}if(pin!==confirm){error('PINs do not match.');return}const button=document.getElementById('bpt-recover-save');button.disabled=true;button.textContent='Verifying…';try{await verifyAccountPassword(password);if(await savePinFromFields('bpt-recover')){error('PIN reset successfully.');setTimeout(showUnlock,650)}}catch(e){console.warn('PIN recovery failed',e);error(e&&e.code==='auth/wrong-password'?'Incorrect account password.':'Could not verify account. Check your password and sign-in session.')}finally{if(document.getElementById('bpt-recover-save')){button.disabled=false;button.textContent='Verify account & reset PIN'}}}}
   function showSettings(){shell('App lock settings','Change your PIN or recover it using your Booked Profit Tracker account password.','<button id="bpt-settings-change">Change PIN</button><button class="secondary" id="bpt-settings-forgot">Forgot PIN?</button><button class="secondary" id="bpt-settings-close">Close</button>');document.getElementById('bpt-settings-change').onclick=showChangePin;document.getElementById('bpt-settings-forgot').onclick=showForgotPin;document.getElementById('bpt-settings-close').onclick=()=>{if(overlay){overlay.remove();overlay=null}}}
+  window.BPT_CONFIRM_DELETE=function(description){
+    return new Promise(resolve=>{
+      const c=cfg();
+      if(!c||!c.salt||!c.digest){alert('Set up your App PIN before deleting financial records.');resolve(false);return}
+      let settled=false,tries=0,waitUntil=0;
+      const finish=value=>{if(settled)return;settled=true;if(overlay){overlay.remove();overlay=null}resolve(value)};
+      shell('Confirm deletion','Enter your existing App PIN to continue deleting '+String(description||'this record')+'.','<label for="bpt-delete-pin">App PIN</label><input id="bpt-delete-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="current-password" aria-label="App PIN"><button id="bpt-delete-verify">Verify PIN</button><button class="secondary" id="bpt-delete-cancel">Cancel</button>');
+      const input=document.getElementById('bpt-delete-pin'),verify=document.getElementById('bpt-delete-verify');
+      const check=async()=>{
+        if(Date.now()<waitUntil){error('Too many attempts. Wait 30 seconds and try again.');return}
+        const pin=input.value;
+        if(!/^\\d{4,8}$/.test(pin)){error('Enter your 4–8 digit App PIN.');return}
+        verify.disabled=true;verify.textContent='Checking…';
+        try{
+          if(await hashPin(pin,c.salt)===c.digest){finish(true);return}
+          tries++;if(tries>=5){tries=0;waitUntil=Date.now()+30000;error('Too many incorrect attempts. Wait 30 seconds.')}
+          else error('Incorrect PIN. Please try again.');
+        }catch(e){error('Could not verify PIN on this device.')}
+        if(!settled){verify.disabled=false;verify.textContent='Verify PIN';input.value='';input.focus()}
+      };
+      verify.onclick=check;
+      input.addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+      document.getElementById('bpt-delete-cancel').onclick=()=>finish(false);
+      setTimeout(()=>input.focus({preventScroll:true}),80);
+    });
+  };
   window.BPT_APP_LOCK_SETTINGS=showSettings;
 
   function init(){
