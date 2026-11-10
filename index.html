@@ -9,7 +9,7 @@
 <meta name="application-name" content="Booked Profit Tracker">
 <meta name="description" content="Booked Profit Tracker — clean realized stock profit tracking with live cloud sync.">
 <link rel="manifest" href="manifest.webmanifest">
-<script src="./app-lock.js?v=2"></script>
+<script src="./app-lock.js?v=3"></script>
 
 <title>Booked Profit Tracker</title>
 <style>
@@ -366,7 +366,7 @@ window.addEventListener('unhandledrejection',function(e){
   var phone=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||window.matchMedia('(display-mode: standalone)').matches||w<=600||((window.screen&&window.screen.width<=600));
   document.documentElement.classList.toggle('bpt-phone',phone); document.body.classList.toggle('bpt-phone',phone);
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js?v=57',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=58',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){});
   }
 })();
 </script>
