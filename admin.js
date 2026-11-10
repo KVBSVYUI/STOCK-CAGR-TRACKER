@@ -14,7 +14,46 @@
   const waitForApp=()=>new Promise((resolve,reject)=>{let n=0;const t=setInterval(async()=>{try{const [a,am,fs]=await loadFirebase();const apps=a.getApps();if(apps[0]){clearInterval(t);resolve({a,am,fs,app:apps[0]});return}}catch(e){}if(++n>80){clearInterval(t);reject(Error('Firebase app not ready'))}},250)});
   const modal=(html)=>{document.querySelectorAll('.app-drawer,.modal-back').forEach(x=>x.remove());const b=document.createElement('div');b.className='modal-back open';b.innerHTML='<div class="modal" style="max-width:900px;max-height:88vh;overflow:auto">'+html+'</div>';document.body.appendChild(b);b.onclick=e=>{if(e.target===b)b.remove()};b.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>b.remove());return b};
   const account=async()=>{const b=modal('<button class="close" data-close type="button">×</button><h3>Account</h3><p style="color:#8997aa">Manage your account and sign out securely.</p><div class="modal-actions"><button id="bptSignOut" class="secondary" type="button">Sign out</button></div>');b.querySelector('#bptSignOut').onclick=async()=>{try{const {am,auth}=current||{};if(auth)await am.signOut(auth)}catch(e){alert('Could not sign out. Please try again.')}}};
-  const mailbox=async()=>{const b=modal('<button class="close" data-close type="button">×</button><h3>📬 Mailbox</h3><p style="color:#8997aa;font-size:12px">Announcements and important updates.</p><div id="bptMailboxList" style="display:grid;gap:10px;margin-top:16px">Loading…</div>');try{const {fs,app,user}=current,db=fs.getFirestore(app);const [as,rs]=await Promise.all([fs.getDocs(fs.query(fs.collection(db,'announcements'),fs.orderBy('createdAt','desc'),fs.limit(30))),fs.getDocs(fs.collection(db,'users',user.uid,'mailboxState'))]);const read=new Set(rs.docs.map(x=>x.id));const list=b.querySelector('#bptMailboxList');if(!as.size){list.innerHTML='<div style="padding:24px;text-align:center;color:#8997aa">No announcements yet.</div>';return}list.innerHTML=as.docs.map(d=>{const x=d.data()||{};return `<article style="padding:14px;border:1px solid #243247;border-radius:14px;background:#0e1927"><div style="display:flex;justify-content:space-between;gap:10px"><b>${esc(x.title||'Announcement')}</b>${read.has(d.id)?'':'<span style="font-size:10px;color:#55d6a0">● NEW</span>'}</div><div style="white-space:pre-wrap;margin-top:8px;line-height:1.55;color:#c8d1dd;font-size:13px">${esc(x.body||'')}</div></article>`}).join('');for(const d of as.docs){if(!read.has(d.id))await fs.setDoc(fs.doc(db,'users',user.uid,'mailboxState',d.id),{readAt:fs.serverTimestamp()},{merge:true})}}catch(e){b.querySelector('#bptMailboxList').innerHTML='<div style="color:#ff8d8d">Could not load mailbox.</div>'}};
+  const mailbox=async()=>{
+    const b=modal('<button class="close" data-close type="button">×</button><h3>📬 Mailbox</h3><p style="color:#8997aa;font-size:12px">Announcements and important updates.</p><div id="bptMailboxList" style="display:grid;gap:10px;margin-top:16px">Loading…</div>');
+    try{
+      const {fs,app,user}=current,db=fs.getFirestore(app);
+      const [as,rs]=await Promise.all([
+        fs.getDocs(fs.query(fs.collection(db,'announcements'),fs.orderBy('createdAt','desc'),fs.limit(30))),
+        fs.getDocs(fs.collection(db,'users',user.uid,'mailboxState'))
+      ]);
+      const read=new Set(rs.docs.map(x=>x.id)),list=b.querySelector('#bptMailboxList');
+      if(!as.size){list.innerHTML='<div style="padding:24px;text-align:center;color:#8997aa">No announcements yet.</div>';return}
+      list.innerHTML=as.docs.map(d=>{
+        const x=d.data()||{};
+        const adminActions=isAdmin
+          ?'<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #243247"><button type="button" class="secondary" data-edit-announcement="'+esc(d.id)+'">Edit</button><button type="button" class="secondary" data-delete-announcement="'+esc(d.id)+'" style="color:#ff9292">Delete</button></div>'
+          :'';
+        return '<article style="padding:14px;border:1px solid #243247;border-radius:14px;background:#0e1927"><div style="display:flex;justify-content:space-between;gap:10px"><b>'+esc(x.title||'Announcement')+'</b>'+(read.has(d.id)?'':'<span style="font-size:10px;color:#55d6a0">● NEW</span>')+'</div><div style="white-space:pre-wrap;margin-top:8px;line-height:1.55;color:#c8d1dd;font-size:13px">'+esc(x.body||'')+'</div>'+adminActions+'</article>';
+      }).join('');
+      if(isAdmin){
+        list.querySelectorAll('[data-edit-announcement]').forEach(btn=>btn.onclick=()=>{
+          const id=btn.dataset.editAnnouncement,record=as.docs.find(d=>d.id===id),x=record?.data()||{};
+          const edit=modal('<button class="close" data-close type="button">×</button><h3>✏️ Edit announcement</h3><label style="display:block;margin-top:16px">Title<input id="bptEditAnnTitle" maxlength="120" value="'+esc(x.title||'')+'" placeholder="Announcement title"></label><label style="display:block;margin-top:12px">Message<textarea id="bptEditAnnBody" maxlength="4000" rows="7" style="width:100%;resize:vertical">'+esc(x.body||'')+'</textarea></label><div class="modal-actions"><button class="secondary" data-close type="button">Cancel</button><button id="bptSaveAnnEdit" class="primary" type="button">Save changes</button></div>');
+          edit.querySelector('#bptSaveAnnEdit').onclick=async()=>{
+            const title=edit.querySelector('#bptEditAnnTitle').value.trim(),body=edit.querySelector('#bptEditAnnBody').value.trim();
+            if(!title||!body)return alert('Enter both a title and message.');
+            const save=edit.querySelector('#bptSaveAnnEdit');save.disabled=true;save.textContent='Saving…';
+            try{await fs.updateDoc(fs.doc(db,'announcements',id),{title,body,updatedAt:fs.serverTimestamp(),updatedBy:user.uid});edit.remove();await mailbox()}
+            catch(e){save.disabled=false;save.textContent='Save changes';alert(e.message||'Could not update announcement.')}
+          };
+        });
+        list.querySelectorAll('[data-delete-announcement]').forEach(btn=>btn.onclick=async()=>{
+          const id=btn.dataset.deleteAnnouncement,record=as.docs.find(d=>d.id===id),title=record?.data()?.title||'this announcement';
+          if(!confirm('Delete "'+title+'"? This will remove it from every user’s mailbox.'))return;
+          btn.disabled=true;btn.textContent='Deleting…';
+          try{await fs.deleteDoc(fs.doc(db,'announcements',id));b.remove();await mailbox()}
+          catch(e){btn.disabled=false;btn.textContent='Delete';alert(e.message||'Could not delete announcement.')}
+        });
+      }
+      for(const d of as.docs)if(!read.has(d.id))await fs.setDoc(fs.doc(db,'users',user.uid,'mailboxState',d.id),{readAt:fs.serverTimestamp()},{merge:true});
+    }catch(e){const list=b.querySelector('#bptMailboxList');if(list)list.innerHTML='<div style="color:#ff8d8d">Could not load mailbox.</div>'}
+  };
   const openMenu=()=>{document.querySelector('.app-drawer')?.remove();const d=document.createElement('div');d.className='app-drawer';d.style.cssText='position:fixed;inset:0;z-index:9999;background:#000b';d.innerHTML='<aside style="width:min(330px,88vw);height:100%;background:#0c141f;border-right:1px solid #2a3a51;padding:22px;box-shadow:20px 0 60px #0008"><button id="bptMenuClose" class="icon" type="button" style="float:right">×</button><h2 style="margin:4px 0 6px;font-size:20px">Menu</h2><p style="color:#8997aa;font-size:11px">Account and app tools</p><div style="margin-top:22px;display:grid;gap:8px"><button id="bptMenuAccount" class="secondary" type="button" style="text-align:left">👤 Account</button><button id="bptMenuMailbox" class="secondary" type="button" style="text-align:left">📬 Mailbox</button>'+(isAdmin?'<button id="bptMenuAdmin" class="secondary" type="button" style="text-align:left">🛡️ Admin</button>':'')+'</div></aside>';document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.remove()};d.querySelector('#bptMenuClose').onclick=()=>d.remove();d.querySelector('#bptMenuAccount').onclick=account;d.querySelector('#bptMenuMailbox').onclick=mailbox;if(isAdmin)d.querySelector('#bptMenuAdmin').onclick=adminDashboard};
   async function adminDashboard(){
   if(!current){
