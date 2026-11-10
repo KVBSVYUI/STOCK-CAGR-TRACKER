@@ -112,18 +112,18 @@
     return new Promise(resolve=>{
       const c=cfg();
       if(!c||!c.salt||!c.digest){alert('Set up your App PIN before deleting financial records.');resolve(false);return}
-      let settled=false,tries=0,waitUntil=0;
+      let settled=false;
       const finish=value=>{if(settled)return;settled=true;if(overlay){overlay.remove();overlay=null}resolve(value)};
       shell('Confirm deletion','Enter your existing App PIN to continue deleting '+String(description||'this record')+'.','<label for="bpt-delete-pin">App PIN</label><input id="bpt-delete-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="current-password" aria-label="App PIN"><button id="bpt-delete-verify">Verify PIN</button><button class="secondary" id="bpt-delete-cancel">Cancel</button>');
       const input=document.getElementById('bpt-delete-pin'),verify=document.getElementById('bpt-delete-verify');
       const check=async()=>{
-        if(Date.now()<waitUntil){error('Too many attempts. Wait 30 seconds and try again.');return}
+        if(Date.now()<blockedUntil){error('Too many attempts. Wait 30 seconds and try again.');return}
         const pin=input.value;
         if(!/^\d{4,8}$/.test(pin)){error('Enter your 4–8 digit App PIN.');return}
         verify.disabled=true;verify.textContent='Checking…';
         try{
-          if(await hashPin(pin,c.salt)===c.digest){finish(true);return}
-          tries++;if(tries>=5){tries=0;waitUntil=Date.now()+30000;error('Too many incorrect attempts. Wait 30 seconds.')}
+          if(await hashPin(pin,c.salt)===c.digest){failures=0;finish(true);return}
+          failures++;if(failures>=5){failures=0;blockedUntil=Date.now()+30000;error('Too many incorrect attempts. Wait 30 seconds.')}
           else error('Incorrect PIN. Please try again.');
         }catch(e){error('Could not verify PIN on this device.')}
         if(!settled){verify.disabled=false;verify.textContent='Verify PIN';input.value='';input.focus()}
